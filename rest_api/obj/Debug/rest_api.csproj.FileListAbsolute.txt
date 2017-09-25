@@ -1,0 +1,114 @@
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\obj\Debug\rest_api.csprojResolveAssemblyReference.cache
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\csc.exe
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\csc.exe.config
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\csc.rsp
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\csi.exe
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\csi.rsp
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.CSharp.Core.targets
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\Microsoft.VisualBasic.Core.targets
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\System.AppContext.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\System.Collections.Immutable.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\System.Diagnostics.StackTrace.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\System.IO.FileSystem.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\System.IO.FileSystem.Primitives.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\System.Reflection.Metadata.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\vbc.exe
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\vbc.exe.config
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\vbc.rsp
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\VBCSCompiler.exe
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\roslyn\VBCSCompiler.exe.config
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\rest_api.dll.config
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\rest_api.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\rest_api.pdb
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\EntityFramework.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\Newtonsoft.Json.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Data.Entity.Repository.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Net.Http.Formatting.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Cors.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Http.Cors.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Http.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Http.WebHost.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\EntityFramework.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Http.Cors.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\Newtonsoft.Json.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Net.Http.Formatting.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Http.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\bin\System.Web.Http.WebHost.xml
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\obj\Debug\rest_api.dll
+c:\users\dogan\documents\visual studio 2017\Projects\rest_api\rest_api\obj\Debug\rest_api.pdb
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\csc.exe
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\csc.exe.config
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\csc.rsp
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\csi.exe
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\csi.rsp
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\System.AppContext.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\System.Collections.Immutable.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\System.Diagnostics.StackTrace.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\System.IO.FileSystem.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\System.IO.FileSystem.Primitives.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\System.Reflection.Metadata.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\vbc.exe
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\vbc.exe.config
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\vbc.rsp
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\VBCSCompiler.exe
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\roslyn\VBCSCompiler.exe.config
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\rest_api.dll.config
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\rest_api.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\rest_api.pdb
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Antlr3.Runtime.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\EntityFramework.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Newtonsoft.Json.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Data.Entity.Repository.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Net.Http.Formatting.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Cors.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Helpers.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Http.Cors.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Http.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Http.WebHost.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Mvc.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Optimization.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Razor.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.WebPages.Deployment.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.WebPages.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.WebPages.Razor.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\WebGrease.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Antlr3.Runtime.pdb
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\EntityFramework.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Helpers.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Http.Cors.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Mvc.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Optimization.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Razor.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.WebPages.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.WebPages.Deployment.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.WebPages.Razor.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\Newtonsoft.Json.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Net.Http.Formatting.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Http.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\bin\System.Web.Http.WebHost.xml
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\obj\Debug\rest_api.csprojResolveAssemblyReference.cache
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\obj\Debug\rest_api.dll
+C:\Users\dogan\Documents\GitHub\rest_api\rest_api\obj\Debug\rest_api.pdb
