@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
+using rest_api.ModelViews;
 
 namespace rest_api.Models
 {
@@ -38,7 +37,6 @@ namespace rest_api.Models
         [Required]
         public int cancel_time { get; set; }
         public string description { get; set; }
-        public DateTime date { get; set; } = DateTime.Now;
         [Required]
         public int zoom { get; set; }
         [Required]
@@ -47,6 +45,15 @@ namespace rest_api.Models
         public double longitude { get; set; }
         [StringLength(255)]
         public string title { get; set; }
+        public DateTime created_date { get; set; } = DateTime.Now;
+        public DateTime? updated_date { get; set; }
+        [NotMapped]
+        public ICollection<AdvertImagesMW> images { get; set; }
+        [NotMapped]
+        public AdvertProperties properties { get; set; }
+        [NotMapped]
+        public AdvertPossibilities possibility { get; set; }
+
 
     }
 }

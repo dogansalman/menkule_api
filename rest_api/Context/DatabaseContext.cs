@@ -11,11 +11,17 @@ namespace rest_api.Context
 
         }
         public DbSet<Advert> advert { get; set; }
+        public DbSet<AdvertImages> advert_images { get; set; }
+        public DbSet<AdvertProperties> advert_properties{ get; set; }
+        public DbSet<AdvertPossibilities> advert_possibilities { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Advert>().ToTable("adverts");
+            modelBuilder.Entity<Advert>().ToTable("Advert");
+            modelBuilder.Entity<AdvertImages>().ToTable("AdvertImages");
+            modelBuilder.Entity<AdvertProperties>().ToTable("AdvertProperties");
+            modelBuilder.Entity<AdvertPossibilities>().ToTable("AdvertPossibilities");
         }
     }
 }

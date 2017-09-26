@@ -135,10 +135,36 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Context\DatabaseContext.cs" />
     <Compile Include="Controllers\AdvertController.cs" />
+    <Compile Include="Controllers\ExceptionController.cs" />
+    <Compile Include="Filters\Gender.cs" />
+    <Compile Include="Filters\IpAdress.cs" />
+    <Compile Include="Filters\Phone.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\MigrationContexts.cs" />
     <Compile Include="Models\Advert.cs" />
+    <Compile Include="Models\AdvertAvailableDate.cs" />
+    <Compile Include="Models\AdvertComments.cs" />
+    <Compile Include="Models\AdvertFeedbacks.cs" />
+    <Compile Include="Models\AdvertImages.cs" />
+    <Compile Include="Models\AdvertLikes.cs" />
+    <Compile Include="Models\AdvertPossibilities.cs" />
+    <Compile Include="Models\AdvertProperties.cs" />
+    <Compile Include="Models\AdvertScores.cs" />
+    <Compile Include="Models\AdvertTypes.cs" />
+    <Compile Include="Models\AdvertUnavailableDate.cs" />
+    <Compile Include="Models\Cities.cs" />
+    <Compile Include="Models\Images.cs" />
+    <Compile Include="Models\Notifications.cs" />
+    <Compile Include="Models\RezervationAdverts.cs" />
+    <Compile Include="Models\Rezervations.cs" />
+    <Compile Include="Models\RezervationVisitors.cs" />
+    <Compile Include="Models\Suggetions.cs" />
+    <Compile Include="Models\Towns.cs" />
+    <Compile Include="Models\Users.cs" />
+    <Compile Include="ModelViews\AdvertImagesMW.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Initialdata\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
