@@ -2,6 +2,7 @@
 using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
+using rest_api.Context;
 
 namespace rest_api.Migrations
 {
@@ -12,6 +13,7 @@ namespace rest_api.Migrations
             AutomaticMigrationsEnabled = true;
         }
 
+        DatabaseContext db = new DatabaseContext();
         protected override void Seed(rest_api.Models.MigrationContexts context)
         {
             //  This method will be called after migrating to the latest version.
@@ -27,6 +29,13 @@ namespace rest_api.Migrations
             //    );
             //
 
+            //Seed Advert Types
+            context.AdvertTypes.AddOrUpdate(
+                at => at.name,
+                new Models.AdvertTypes { name = "Villa"},
+                new Models.AdvertTypes { name = "Oda" },
+                new Models.AdvertTypes { name = "Tüm Ev" }
+                );
             // Seed Cities and Towns
             var sqlfiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/initialdata", "*.sql");
             sqlfiles.ToList().ForEach(x => context.Database.ExecuteSqlCommand(File.ReadAllText(x)));
