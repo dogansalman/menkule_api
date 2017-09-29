@@ -15,6 +15,8 @@ namespace rest_api.Context
         public DbSet<AdvertProperties> advert_properties{ get; set; }
         public DbSet<AdvertPossibilities> advert_possibilities { get; set; }
         public DbSet<AdvertTypes> advert_types { get; set; }
+        public DbSet<AdvertUnavailableDate>advert_unavaiable_dates { get; set; }
+        public DbSet<AdvertAvailableDate>advert_avaiable_dates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -24,6 +26,9 @@ namespace rest_api.Context
             modelBuilder.Entity<AdvertProperties>().ToTable("AdvertProperties");
             modelBuilder.Entity<AdvertPossibilities>().ToTable("AdvertPossibilities");
             modelBuilder.Entity<AdvertTypes>().ToTable("AdvertTypes");
+            modelBuilder.Entity<AdvertUnavailableDate>().ToTable("AdvertUnavailableDate");
+            modelBuilder.Entity<AdvertAvailableDate>().ToTable("AdvertAvailableDate");
+
         }
     }
 }

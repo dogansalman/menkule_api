@@ -53,6 +53,10 @@ namespace rest_api.Models
         public AdvertProperties properties { get; set; }
         [NotMapped]
         public AdvertPossibilities possibility { get; set; }
+        [NotMapped]
+        public ICollection<AdvertUnavailableDate> unavaiable_date { get; set; }
+        [NotMapped]
+        public ICollection<AdvertAvailableDate> avaiable_dates { get; set; }
 
 
     }
