@@ -7,7 +7,6 @@ namespace rest_api.Models
     public class AdvertUnavailableDate
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         public int day { get; set; }
@@ -18,7 +17,6 @@ namespace rest_api.Models
         [Required]
         public DateTime fulldate { get; set; }
         public int rezervation_id { get; set; }
-        [Required]
         public int advert_id { get; set; }
         public DateTime created_date { get; set; } = DateTime.Now;
 

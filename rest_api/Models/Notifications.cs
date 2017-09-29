@@ -10,7 +10,6 @@ namespace rest_api.Models
     public class Notifications
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         public int user_id { get; set; }

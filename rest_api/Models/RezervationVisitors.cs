@@ -8,7 +8,6 @@ namespace rest_api.Models
     public class RezervationVisitors
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         public int rezervation_id { get; set; }

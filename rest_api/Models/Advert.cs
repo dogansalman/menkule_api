@@ -9,9 +9,8 @@ namespace rest_api.Models
     public class Advert
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
-
         [Required]
         public int advert_type_id { get; set; }
         [MaxLength(255)]
@@ -20,14 +19,13 @@ namespace rest_api.Models
         public int city_id { get; set; }
         [Required]
         public int town_id { get; set; }
-        [Required]
         public int user_id { get; set; }
         [Required]
         public string entry_time { get; set; }
         [Required]
         public string exit_time { get; set; }
         [Required]
-        public Boolean state { get; set; }
+        public Boolean state { get; set; } = false;
         public int views { get; set; }
         public int score { get; set; }
         [Required]
@@ -48,16 +46,21 @@ namespace rest_api.Models
         public DateTime created_date { get; set; } = DateTime.Now;
         public DateTime? updated_date { get; set; }
         [NotMapped]
+        [Required]
         public ICollection<AdvertImagesMW> images { get; set; }
         [NotMapped]
+        [Required]
         public AdvertProperties properties { get; set; }
         [NotMapped]
+        [Required]
         public AdvertPossibilities possibility { get; set; }
         [NotMapped]
+        [Required]
         public ICollection<AdvertUnavailableDate> unavaiable_date { get; set; }
         [NotMapped]
-        public ICollection<AdvertAvailableDate> avaiable_dates { get; set; }
-
+        [Required]
+        public ICollection<AdvertAvailableDate> available_date { get; set; }
+      
 
     }
 }

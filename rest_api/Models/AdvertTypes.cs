@@ -7,7 +7,6 @@ namespace rest_api.Models
     public class AdvertTypes
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         [StringLength(255)]

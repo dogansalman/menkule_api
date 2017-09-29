@@ -7,7 +7,6 @@ namespace rest_api.Models
     public class AdvertScores
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         public int score { get; set; }

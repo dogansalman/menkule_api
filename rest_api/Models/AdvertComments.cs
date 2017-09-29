@@ -10,7 +10,6 @@ namespace rest_api.Models
     public class AdvertComments
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         public int advert_id { get; set; }

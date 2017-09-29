@@ -244,3 +244,5 @@ C:\Users\bilgi islem\Documents\Github\menkule_api\rest_api\bin\System.Web.Http.W
 C:\Users\bilgi islem\Documents\Github\menkule_api\rest_api\obj\Debug\rest_api.csprojResolveAssemblyReference.cache
 C:\Users\bilgi islem\Documents\Github\menkule_api\rest_api\obj\Debug\rest_api.dll
 C:\Users\bilgi islem\Documents\Github\menkule_api\rest_api\obj\Debug\rest_api.pdb
+C:\Users\bilgi islem\Documents\Github\menkule_api\rest_api\bin\EntityFramework.SqlServer.dll
+C:\Users\bilgi islem\Documents\Github\menkule_api\rest_api\bin\EntityFramework.SqlServer.xml

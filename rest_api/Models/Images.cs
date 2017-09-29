@@ -5,7 +5,6 @@ namespace rest_api.Models
     public class Images
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         [StringLength(255)]
