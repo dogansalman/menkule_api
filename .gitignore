@@ -1,4 +1,4 @@
 ### ignore packages
 /packages/
-/.vs
-rest_api/obj/
+rest_api/obj
+.vs/
