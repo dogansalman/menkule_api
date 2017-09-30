@@ -1,2 +1,4 @@
 ### ignore packages
 /packages/
+rest_api/obj
+.vs/
