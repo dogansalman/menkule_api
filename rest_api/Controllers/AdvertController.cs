@@ -3,8 +3,6 @@ using System.Linq;
 using System.Web.Http;
 using rest_api.Context;
 using rest_api.Models;
-using System.Data.Entity.Migrations;
-using rest_api.ModelViews;
 using System;
 
 namespace rest_api.Controllers
@@ -17,9 +15,56 @@ namespace rest_api.Controllers
 
         [HttpGet]
         [Route("")]
-        public List<Advert> get()
+        public object get()
         {
-            return db.advert.OrderByDescending(a => a.id).ToList();
+            //return db.advert.OrderByDescending(a => a.id).ToList();
+
+
+            return (from a in db.advert
+                    join c in db.cities on a.city_id equals c.id
+                    join t in db.towns on a.town_id equals t.id
+                    join at in db.advert_types on a.advert_type_id equals at.id
+                    // where a => a.Assign.assigned_to == "myname"
+                    select new { advert = a, city = c, town = t, advert_type = at }).ToList();
+
+
+            /*
+             
+            return db.advert.Join(
+                db.cities,
+                a => a.city_id,
+                c => c.id,
+                (a, c) => new
+                {
+                    advert = a,
+                    cities = c
+                }
+                )
+                .Join(
+                db.towns,
+                a => a.advert.town_id,
+                t => t.id,
+                (a,t) =>  new
+                {
+                    advert = a,
+                    towns = t
+                }
+                ).ToList();
+             * */
+
+
+            /*
+         return db.personnels.Join(
+            db.departments,
+            p => p.department_id,
+            d => d.id,
+            (p, d) => new
+            {
+                Personnel = p,
+                Department = d
+            }).OrderByDescending(pd => pd.Personnel.name).ToList();
+         */
+
         }
 
         //Detail

@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using rest_api.Filters;
 using System;
 
 namespace rest_api.Models
@@ -14,10 +12,7 @@ namespace rest_api.Models
         [Required]
         [StringLength(300, ErrorMessage = "Açıklama en fazla 300 karakter olabilir.")]
         public string description { get; set; }
-        [Required]
-        [StringLength(255, ErrorMessage = "IP Adresi En fazla 255 karakter olabilir.")]
-        [IpAdress(ErrorMessage = "Ip adresi hatalı")]
-        public string ip { get; set; }
+        public int user_id { get; set; }
         [Required]
         [StringLength(255)]
         public string fullname { get; set; }

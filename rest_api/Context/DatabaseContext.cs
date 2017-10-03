@@ -18,6 +18,10 @@ namespace rest_api.Context
         public DbSet<AdvertUnavailableDate>advert_unavaiable_dates { get; set; }
         public DbSet<AdvertAvailableDate>advert_avaiable_dates { get; set; }
         public DbSet<Images>images { get; set; }
+        public DbSet<AdvertScores> advert_scores { get; set; }
+        public DbSet<AdvertFeedbacks> advert_feedbakcs { get; set; }
+        public DbSet<Cities> cities { get; set; }
+        public DbSet<Towns> towns { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -30,6 +34,11 @@ namespace rest_api.Context
             modelBuilder.Entity<AdvertUnavailableDate>().ToTable("AdvertUnavailableDate");
             modelBuilder.Entity<AdvertAvailableDate>().ToTable("AdvertAvailableDate");
             modelBuilder.Entity<Images>().ToTable("Images");
+            modelBuilder.Entity<AdvertScores>().ToTable("AdvertScores");
+            modelBuilder.Entity<AdvertFeedbacks>().ToTable("AdvertFeedbacks");
+            modelBuilder.Entity<Cities>().ToTable("Cities");
+            modelBuilder.Entity<Towns>().ToTable("Towns");
+
 
         }
     }

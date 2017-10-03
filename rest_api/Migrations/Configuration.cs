@@ -36,11 +36,10 @@ namespace rest_api.Migrations
                 new Models.AdvertTypes { name = "Oda" },
                 new Models.AdvertTypes { name = "Tüm Ev" }
                 );
+
             // Seed Cities and Towns
-            var sqlfiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "/initialdata", "*.sql");
+            var sqlfiles = Directory.GetFiles(AppDomain.CurrentDomain.GetData("DataDirectory").ToString() + "/initialdata", "*.sql");
             sqlfiles.ToList().ForEach(x => context.Database.ExecuteSqlCommand(File.ReadAllText(x)));
-
-
         }
     }
 }

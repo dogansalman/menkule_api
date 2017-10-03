@@ -136,7 +136,12 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Context\DatabaseContext.cs" />
     <Compile Include="Controllers\AdvertController.cs" />
+    <Compile Include="Controllers\AdvertScoresController.cs" />
+    <Compile Include="Controllers\AdvertTypesController.cs" />
+    <Compile Include="Controllers\CitiesController.cs" />
     <Compile Include="Controllers\ExceptionController.cs" />
+    <Compile Include="Controllers\FeedbacksController.cs" />
+    <Compile Include="Controllers\ResponserController.cs" />
     <Compile Include="Filters\Gender.cs" />
     <Compile Include="Filters\IpAdress.cs" />
     <Compile Include="Filters\Phone.cs" />
