@@ -10,6 +10,9 @@ namespace rest_api.Controllers
     [RoutePrefix("adverts")]
     public class AdvertController : ApiController
     {
+        /*
+         LEFT JOIN advert_images ON adverts.id = advert_images.advert_id AND is_default = 1 LEFT JOIN images ON advert_images.image_id = images.id
+             */
         //Get
         DatabaseContext db = new DatabaseContext();
 
@@ -17,54 +20,16 @@ namespace rest_api.Controllers
         [Route("")]
         public object get()
         {
-            //return db.advert.OrderByDescending(a => a.id).ToList();
-
 
             return (from a in db.advert
-                    join c in db.cities on a.city_id equals c.id
-                    join t in db.towns on a.town_id equals t.id
-                    join at in db.advert_types on a.advert_type_id equals at.id
-                    // where a => a.Assign.assigned_to == "myname"
-                    select new { advert = a, city = c, town = t, advert_type = at }).ToList();
-
-
-            /*
-             
-            return db.advert.Join(
-                db.cities,
-                a => a.city_id,
-                c => c.id,
-                (a, c) => new
-                {
-                    advert = a,
-                    cities = c
-                }
-                )
-                .Join(
-                db.towns,
-                a => a.advert.town_id,
-                t => t.id,
-                (a,t) =>  new
-                {
-                    advert = a,
-                    towns = t
-                }
-                ).ToList();
-             * */
-
-
-            /*
-         return db.personnels.Join(
-            db.departments,
-            p => p.department_id,
-            d => d.id,
-            (p, d) => new
-            {
-                Personnel = p,
-                Department = d
-            }).OrderByDescending(pd => pd.Personnel.name).ToList();
-         */
-
+                join c in db.cities on a.city_id equals c.id
+                join t in db.towns on a.town_id equals t.id
+                join at in db.advert_types on a.advert_type_id equals at.id
+                join ai in db.advert_images on a.id equals ai.id
+                //where a => a.Assign.assigned_to == "myname"
+                join img in db.images on ai.image_id equals img.id
+                // where ai.is_default == true
+                select new { advert = a, city = c, town = t, advert_type = at, images = ai }).ToList();
         }
 
         //Detail
