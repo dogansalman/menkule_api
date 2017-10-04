@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Http;
 using rest_api.Context;
 using rest_api.Models;
@@ -10,9 +9,6 @@ namespace rest_api.Controllers
     [RoutePrefix("adverts")]
     public class AdvertController : ApiController
     {
-        /*
-         LEFT JOIN advert_images ON adverts.id = advert_images.advert_id AND is_default = 1 LEFT JOIN images ON advert_images.image_id = images.id
-             */
         //Get
         DatabaseContext db = new DatabaseContext();
 
@@ -20,16 +16,14 @@ namespace rest_api.Controllers
         [Route("")]
         public object get()
         {
-
             return (from a in db.advert
-                join c in db.cities on a.city_id equals c.id
-                join t in db.towns on a.town_id equals t.id
-                join at in db.advert_types on a.advert_type_id equals at.id
-                join ai in db.advert_images on a.id equals ai.id
-                //where a => a.Assign.assigned_to == "myname"
-                join img in db.images on ai.image_id equals img.id
-                // where ai.is_default == true
-                select new { advert = a, city = c, town = t, advert_type = at, images = ai }).ToList();
+                    from aimg in db.advert_images
+                    where aimg.is_default == true && aimg.advert_id == a.id
+                    join c in db.cities on a.city_id equals c.id
+                    join t in db.towns on a.town_id equals t.id
+                    join at in db.advert_types on a.advert_type_id equals at.id
+                    join img in db.images on aimg.image_id equals img.id
+                select new { advert = a, city = c.name, town = t.name, advert_type = at.name, image = img.url }).ToList();
         }
 
         //Detail

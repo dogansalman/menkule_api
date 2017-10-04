@@ -22,6 +22,7 @@ namespace rest_api.Context
         public DbSet<AdvertFeedbacks> advert_feedbakcs { get; set; }
         public DbSet<Cities> cities { get; set; }
         public DbSet<Towns> towns { get; set; }
+        public DbSet<AdvertComments> advert_comments { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -38,6 +39,7 @@ namespace rest_api.Context
             modelBuilder.Entity<AdvertFeedbacks>().ToTable("AdvertFeedbacks");
             modelBuilder.Entity<Cities>().ToTable("Cities");
             modelBuilder.Entity<Towns>().ToTable("Towns");
+            modelBuilder.Entity<AdvertComments>().ToTable("AdvertComments");
 
 
         }
