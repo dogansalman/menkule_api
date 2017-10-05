@@ -11,6 +11,7 @@ namespace rest_api.Controllers
     {
         DatabaseContext db = new DatabaseContext();
         [HttpGet]
+  
         [Route("")]
         public List<Cities> cities()
         {

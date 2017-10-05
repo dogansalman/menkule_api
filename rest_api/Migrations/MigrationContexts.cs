@@ -18,6 +18,9 @@ namespace rest_api.Models
                 .HasKey(pp => new { pp.personel_id, pp.production_id });
              */
 
+            //modelBuilder.Entity<Users>()
+            //    .HasKey(u => new {u.email, u.gsm });
+
 
         }
 
