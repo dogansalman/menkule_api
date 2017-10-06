@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Security.Claims;
@@ -14,30 +13,37 @@ namespace rest_api.Controllers
     public class AdvertCommentsController : ApiController
     {
         DatabaseContext db = new DatabaseContext();
-        // Get Advert Comments
-        [HttpGet]
-        [Route("advert/{id}")]
-        public object get(int id)
-        {
-            return from c in db.advert_comments
-                   join u in db.users on c.user_id equals u.id
-                   join i in db.images on u.image_id equals i.id
-                   into users
-                   where c.advert_id == id && c.state == true
-                   from img in users.DefaultIfEmpty()
-                   select new { comment = c, user = new UserCommentMV { id = u.id, fullname = u.name + " " + u.lastname, photo = img.url } };
-
-        }
-
-        // Get User Comments
+    
+        // Get Comment
         [Authorize]
         [HttpGet]
-        [Route("user")]
-        public List<AdvertComments> getUserComment()
+        [Route("{id}")]
+        public IHttpActionResult read(int id)
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-            return db.advert_comments.Where(a => a.user_id == user_id).ToList();
+            AdvertComments comment = db.advert_comments.Where(ac => ac.id == id).FirstOrDefault();
+            if (comment == null) return NotFound();
+            return Ok(comment);
+
+        }
+
+        // Get Comments
+        [Authorize]
+        [HttpGet]
+        [Route("")]
+        public object gets()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            return from c in db.advert_comments
+                   from aimg in db.advert_images
+                   where aimg.is_default == true && aimg.advert_id == c.advert_id
+                   join i in db.images on aimg.image_id equals i.id
+                   into userscomments
+                   where c.user_id == user_id
+                   from img in userscomments.DefaultIfEmpty()
+                   select new { comment = c, advert_photo = img.url, advert_id = c.advert_id };
         }
 
         // Add
@@ -97,6 +103,45 @@ namespace rest_api.Controllers
                 }
             }
             return Ok(advertComments);
+        }
+
+        // Delete
+        [Authorize]
+        [HttpDelete]
+        [Route("{id}")]
+        public IHttpActionResult delete(int id)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            AdvertComments comment = db.advert_comments.Where(ac => ac.id == id).FirstOrDefault();
+            if (comment == null) return NotFound();
+            db.advert_comments.Remove(comment);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+            return Ok();
+
+        }
+
+
+        // Get Advert Comments
+        [HttpGet]
+        [Route("advert/{id}")]
+        public object get(int id)
+        {
+            return from c in db.advert_comments
+                   join u in db.users on c.user_id equals u.id
+                   join i in db.images on u.image_id equals i.id
+                   into users
+                   where c.advert_id == id && c.state == true
+                   from img in users.DefaultIfEmpty()
+                   select new { comment = c, user = new UserCommentMV { id = u.id, fullname = u.name + " " + u.lastname, photo = img.url } };
+
         }
     }
 }
