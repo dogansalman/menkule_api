@@ -10,9 +10,9 @@ namespace rest_api.OAuth.Provider
     public class AuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
         // OAuthAuthorizationServerProvider sınıfının client erişimine izin verebilmek için ilgili ValidateClientAuthentication metotunu override ediyoruz.
-        public override async System.Threading.Tasks.Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
+        public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
-            context.Validated();
+           context.Validated();
         }
 
         DatabaseContext db = new DatabaseContext();
@@ -28,14 +28,11 @@ namespace rest_api.OAuth.Provider
             Users usr = db.users.Where(u => u.email == context.UserName && u.password == context.Password).FirstOrDefault();
             if (usr != null)
             {
-                
-
                 var identity = new ClaimsIdentity(context.Options.AuthenticationType);
                 identity.AddClaim(new Claim("user_id", usr.id.ToString()));
 
                 //Role eklemek için
                 //identity.AddClaim(new Claim(ClaimTypes.Role, "user"));
-                
                 context.Validated(identity);
             }
             else

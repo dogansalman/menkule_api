@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Web.Http;
-using rest_api.Context;
-using rest_api.Models;
 using System.Linq;
 using System.Security.Claims;
+using rest_api.Context;
+using rest_api.Models;
+using rest_api.Libary.Exceptions;
 
 namespace rest_api.Controllers
 {
@@ -30,7 +31,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionController.Handle(ex);
+                ExceptionHandler.Handle(ex);
             }
             return Ok(advertFeedbacks);
         }

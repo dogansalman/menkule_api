@@ -2,9 +2,9 @@
 using System.Net.Http;
 using System.Web.Http;
 
-namespace rest_api.Controllers
+namespace rest_api.Libary.Responser
 {
-    public  class ResponserController : ApiController
+    public static class Responser
     {
         public static void Response(HttpStatusCode status, string message)
         {

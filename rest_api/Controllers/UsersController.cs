@@ -1,10 +1,12 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Security.Claims;
 using rest_api.Models;
 using rest_api.Context;
 using rest_api.ModelViews;
-using System.Security.Claims;
+using rest_api.Libary.Exceptions;
+using rest_api.Libary.Responser;
 
 namespace rest_api.Controllers
 {
@@ -19,11 +21,19 @@ namespace rest_api.Controllers
         public IHttpActionResult add([FromBody] Users user)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (db.users.Any(u => u.email == user.email)) ResponserController.Response(HttpStatusCode.Forbidden, "e-posta adresi kullanılmaktadır.");
-            if (db.users.Any(u => u.gsm == user.gsm)) ResponserController.Response(HttpStatusCode.Forbidden, "gsm no kullanılmaktadır.");
+            if (db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.Forbidden, "e-posta adresi kullanılmaktadır.");
+            if (db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.Forbidden, "gsm no kullanılmaktadır.");
             
             db.users.Add(user);
-            db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+           
             return Ok(new UsersMV
             {
                 name = user.name,

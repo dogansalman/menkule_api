@@ -46,9 +46,7 @@ namespace rest_api.Models
         [Index("IX_UserGsm", 2, IsUnique = true)]
         public string gsm { get; set; }
         public int? image_id { get; set; }
-        [Range(0, 1)]
         public bool email_state { get; set; } = false;
-        [Range(0, 1)]
         public bool gsm_state { get; set; } = false;
         [StringLength(255)]
         public string email_activation_code { get; set; }
@@ -63,8 +61,7 @@ namespace rest_api.Models
         [StringLength(255)]
         public string facebook_id { get; set; }
         public DateTime? gsm_last_update { get; set; }
-        [Range(0, 1)]
-        public int ownershiping { get; set; }
+        public bool ownershiping { get; set; }
         public bool state { get; set; }
         [StringLength(255)]
         public string description { get; set; }

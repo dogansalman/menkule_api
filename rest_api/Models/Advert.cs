@@ -9,7 +9,6 @@ namespace rest_api.Models
     public class Advert
     {
         [Key]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         public int advert_type_id { get; set; }
@@ -25,7 +24,7 @@ namespace rest_api.Models
         [Required]
         public string exit_time { get; set; }
         [Required]
-        public Boolean state { get; set; } = false;
+        public bool state { get; set; } = false;
         public int views { get; set; }
         public int score { get; set; }
         [Required]

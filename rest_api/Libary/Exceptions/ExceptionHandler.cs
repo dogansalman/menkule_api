@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
-namespace rest_api.Controllers
+namespace rest_api.Libary.Exceptions
 {
-    public class ExceptionController : ApiController
+    public static class ExceptionHandler
     {
         public static void Handle(Exception e)
         {

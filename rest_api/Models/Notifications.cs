@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace rest_api.Models
 {
@@ -19,9 +15,8 @@ namespace rest_api.Models
         [Required]
         [StringLength(500)]
         public string detail { get; set; }
-        [Range(0, 1)]
         [Required]
-        public int state { get; set; } = 0;
+        public bool state { get; set; } = false;
         public DateTime created_date { get; set; } = DateTime.Now;
         public DateTime? updated_date { get; set; }
 

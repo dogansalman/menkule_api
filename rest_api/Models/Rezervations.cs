@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using rest_api.Filters;
 namespace rest_api.Models
@@ -39,10 +35,8 @@ namespace rest_api.Models
         public DateTime exit_date { get; set; }
         [StringLength(255)]
         public string description_state { get; set; }
-        [Range(0,1)]
-        public int state { get; set; }
-        [Range(0, 1)]
-        public int is_cancel { get; set; }
+        public bool state { get; set; }
+        public bool is_cancel { get; set; }
         [StringLength(255)]
         public string note { get; set; }
         public DateTime created_date { get; set; } = DateTime.Now;

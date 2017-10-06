@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using rest_api.Filters;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace rest_api.Models
 {
