@@ -167,26 +167,46 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult update([FromBody] Advert advert, int id)
         {
-            //TODO update properties images possibility avaiable_date unaviabla_date
+            //TODO update  images avaiable_date unaviabla_date
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             if (db.advert.Where(a => a.id == id && a.user_id == user_id).FirstOrDefault() == null) return NotFound();
+            db.Entry(advert).State = System.Data.Entity.EntityState.Detached;
 
+            AdvertPossibilities apos = db.advert_possibilities.Where(aposs => aposs.advert_id == id).First();
+            db.Entry(advert.possibility).State = System.Data.Entity.EntityState.Detached;
+
+            AdvertProperties ap = db.advert_properties.Where(app => app.advert_id == id).First();
+            db.Entry(advert.properties).State = System.Data.Entity.EntityState.Detached;
+
+         
             using (var dbContext = new DatabaseContext())
             {
+                //Advert
                 advert.id = id;
+                advert.user_id = user_id;
+                advert.updated_date = DateTime.Now;
+                advert.state = false;
                 dbContext.Entry(advert).State = System.Data.Entity.EntityState.Modified;
-                try
-                {
-                    dbContext.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    ExceptionHandler.Handle(ex);
-                }
+
+                //Possibilities
+                advert.possibility.advert_id = advert.id;
+                advert.possibility.id = apos.id;
+                advert.possibility.updated_date = DateTime.Now;
+                dbContext.Entry(advert.possibility).State = System.Data.Entity.EntityState.Modified;
+
+                //Properties
+                advert.properties.advert_id = advert.id;
+                advert.properties.id = ap.id;
+                advert.properties.updated_date = DateTime.Now;
+                dbContext.Entry(advert.properties).State = System.Data.Entity.EntityState.Modified;
+
+                dbContext.SaveChanges();
+   
             }
+
             return Ok(advert);
 
         }
