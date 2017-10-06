@@ -3,6 +3,7 @@ using System.Web.Http;
 using rest_api.Context;
 using rest_api.Models;
 using System;
+using System.Security.Claims;
 
 namespace rest_api.Controllers
 {
@@ -11,11 +12,13 @@ namespace rest_api.Controllers
     {
         //Get
         DatabaseContext db = new DatabaseContext();
-
+        [Authorize]
         [HttpGet]
         [Route("")]
         public object get()
         {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             return (from a in db.advert
                     from aimg in db.advert_images
                     where aimg.is_default == true && aimg.advert_id == a.id
@@ -38,16 +41,22 @@ namespace rest_api.Controllers
             advert.possibility = db.advert_possibilities.FirstOrDefault(ap => ap.advert_id == advert.id);
             advert.unavaiable_date = db.advert_unavaiable_dates.Where(aud => aud.advert_id == advert.id).ToList();
             advert.available_date = db.advert_avaiable_dates.Where(aad => aad.advert_id == advert.id).ToList();
-            
             return Ok(advert);
         }
 
         //Add
+        [Authorize]
         [HttpPost]
         [Route("")]
         public IHttpActionResult add([FromBody] Advert advert)
         {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
             if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            advert.user_id = user_id;
+
             db.advert.Add(advert);
             db.SaveChanges();
 
@@ -113,10 +122,13 @@ namespace rest_api.Controllers
 
         //Delete
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public IHttpActionResult delete(int id)
         {
-            Advert advert = db.advert.Find(id);
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            Advert advert = db.advert.Where(a => a.id == id && a.user_id == user_id).FirstOrDefault();
             if (advert == null) return NotFound();
             db.advert.Remove(advert);
 
@@ -150,13 +162,16 @@ namespace rest_api.Controllers
 
         //Update
         [HttpPut]
+        [Authorize]
         [Route("{id}")]
         public IHttpActionResult update([FromBody] Advert advert, int id)
         {
             //TODO update properties images possibility avaiable_date unaviabla_date
-
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (db.advert.Find(id) == null) return NotFound();
+
+            if (db.advert.Where(a => a.id == id && a.user_id == user_id).FirstOrDefault() == null) return NotFound();
 
             using (var dbContext = new DatabaseContext())
             {

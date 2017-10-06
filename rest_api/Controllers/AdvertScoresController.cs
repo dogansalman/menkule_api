@@ -2,7 +2,7 @@
 using rest_api.Context;
 using rest_api.Models;
 using System.Linq;
-
+using System.Security.Claims;
 
 namespace rest_api.Controllers
 {
@@ -12,18 +12,17 @@ namespace rest_api.Controllers
     {
         DatabaseContext db = new DatabaseContext();
         [HttpPost]
+        [Authorize]
         [Route("")]
         public IHttpActionResult add([FromBody] AdvertScores advertScore)
         {
 
-           
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             if (!ModelState.IsValid) return BadRequest(ModelState);
             
             if (!db.advert.Any(a => a.id == advertScore.advert_id)) return NotFound();
-            if (db.advert_scores.Any(adscr => adscr.advert_id == advertScore.advert_id && adscr.user_id == 0)) {
-                ResponserController.Response(System.Net.HttpStatusCode.Forbidden, "Daha önce puan eklenmiş.");
-            } 
-
+           
             db.advert_scores.Add(advertScore);
             try
             {

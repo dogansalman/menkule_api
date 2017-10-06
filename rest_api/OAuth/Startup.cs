@@ -25,7 +25,7 @@ namespace rest_api.OAuth
         {
             OAuthAuthorizationServerOptions oAuthAuthorizationServerOptions = new OAuthAuthorizationServerOptions()
             {
-                TokenEndpointPath = new Microsoft.Owin.PathString("/token"), // token alacağımız path'i belirtiyoruz
+                TokenEndpointPath = new Microsoft.Owin.PathString("/auth/login"), // token alacağımız path'i belirtiyoruz
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 AllowInsecureHttp = true,
                 Provider = new AuthorizationServerProvider()

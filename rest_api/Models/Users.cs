@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using rest_api.Filters;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace rest_api.Models
 {
     public class Users
@@ -28,6 +30,7 @@ namespace rest_api.Models
         [Required]
         [StringLength(255)]
         [EmailAddress]
+        [Index("IX_UserEmail", 1, IsUnique = true)]
         public string email
         {
             get { return _email; }
@@ -39,6 +42,8 @@ namespace rest_api.Models
         public string password { get; set; }
         [Required]
         [PhoneMask("0000000000")]
+        [StringLength(11)]
+        [Index("IX_UserGsm", 2, IsUnique = true)]
         public string gsm { get; set; }
         public int? image_id { get; set; }
         [Range(0, 1)]

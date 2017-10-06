@@ -47,13 +47,14 @@ namespace rest_api.Controllers
         public IHttpActionResult get()
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             var user = db.users.GroupJoin(
                  db.images,
                  u => u.image_id,
                  i => i.id,
                  (u, i) => new { user = u, image = i }
                  )
-                 .Where(u => u.user.id == int.Parse(claimsIdentity.FindFirst("user_id").Value))
+                 .Where(u => u.user.id == user_id)
                  .SelectMany(userWithImage =>
                  userWithImage.image.DefaultIfEmpty(),
                  (u, i) => new UsersMV
