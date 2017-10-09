@@ -24,7 +24,7 @@ namespace rest_api.Context
         public DbSet<Towns> towns { get; set; }
         public DbSet<AdvertComments> advert_comments { get; set; }
         public DbSet<Users> users { get; set; }
-
+        public DbSet<Suggetions> suggestions { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -42,6 +42,7 @@ namespace rest_api.Context
             modelBuilder.Entity<Towns>().ToTable("Towns");
             modelBuilder.Entity<AdvertComments>().ToTable("AdvertComments");
             modelBuilder.Entity<Users>().ToTable("users");
+            modelBuilder.Entity<Suggetions>().ToTable("Suggetions");
 
 
 
