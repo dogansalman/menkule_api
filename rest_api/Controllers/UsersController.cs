@@ -10,11 +10,12 @@ using rest_api.Libary.Responser;
 
 namespace rest_api.Controllers
 {
+  
     [RoutePrefix("users")]
     public class UsersController : ApiController
     {
         DatabaseContext db = new DatabaseContext();
-       
+     
         // Add
         [HttpPost]
         [Route("")]
@@ -86,5 +87,30 @@ namespace rest_api.Controllers
             return Ok(user);
         }
 
+        // Validate GSM
+        [HttpGet]
+        [Authorize]
+        [Route("validate/gsm")]
+        public IHttpActionResult gsm()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            if (!db.users.Any(u => u.gsm_state == true && u.id == user_id)) Responser.Response(HttpStatusCode.Forbidden, "Gsm not approved");
+            return Ok();
+        }
+
+        // Validate Email
+        [HttpGet]
+        [Authorize]
+        [Route("validate/mail")]
+        public IHttpActionResult mail()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            if (!db.users.Any(u => u.email_state == true && u.id == user_id)) Responser.Response(HttpStatusCode.Forbidden, "E-mail not approved");
+            return Ok();
+        }
     }
 }
