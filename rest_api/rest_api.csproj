@@ -80,6 +80,9 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.Entity.Repository, Version=2.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.Entity.Repository.2.0.0.1\lib\net45\System.Data.Entity.Repository.dll</HintPath>
     </Reference>
@@ -149,6 +152,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Libary\Mailgun\templates\TextTemplate1.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TextTemplate1.txt</LastGenOutput>
+    </Content>
+    <Content Include="Libary\Mailgun\templates\TextTemplate1.txt">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TextTemplate1.tt</DependentUpon>
+    </Content>
     <Content Include="LICENSE.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -177,6 +189,8 @@
     </Compile>
     <Compile Include="Libary\Bcrypt\Bcrypt.cs" />
     <Compile Include="Libary\Exceptions\ExceptionHandler.cs" />
+    <Compile Include="Libary\JsonHelper\JsonHelper.cs" />
+    <Compile Include="Libary\Mailgun\Mailgun.cs" />
     <Compile Include="Libary\MailSender\MailSender.cs" />
     <Compile Include="Libary\Responser\Responser.cs" />
     <Compile Include="Migrations\Configuration.cs" />
@@ -225,7 +239,9 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Initialdata\" />
-    <Folder Include="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

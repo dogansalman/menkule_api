@@ -33,8 +33,8 @@ namespace rest_api.Controllers
             string gsm_code = rnd.Next(9999, 999999).ToString();
             string email_code = rnd.Next(9999, 999999).ToString();
 
-            //create user
-            Users userData = new Users {
+            //create user 
+             Users userData = new Users {
                 name = user.name,
                 lastname = user.lastname,
                 email = user.email,
@@ -46,6 +46,8 @@ namespace rest_api.Controllers
                 email_activation_code = email_code,
                 gsm_activation_code = gsm_code
             };
+            
+
             //insert user
             db.users.Add(userData);
 
