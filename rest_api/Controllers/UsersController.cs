@@ -7,7 +7,7 @@ using rest_api.Context;
 using rest_api.ModelViews;
 using rest_api.Libary.Exceptions;
 using rest_api.Libary.Responser;
-
+using rest_api.Libary.Bcrypt;
 namespace rest_api.Controllers
 {
   
@@ -24,8 +24,11 @@ namespace rest_api.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.Forbidden, "e-posta adresi kullanılmaktadır.");
             if (db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.Forbidden, "gsm no kullanılmaktadır.");
-            
+
+            //hash password
+            user.password = Bcrypt.hash(user.password);
             db.users.Add(user);
+
             try
             {
                 db.SaveChanges();
@@ -87,6 +90,10 @@ namespace rest_api.Controllers
             return Ok(user);
         }
 
+        //Update Password
+        [HttpPost]
+        [Authorize]
+        [Route("password")]
     
         /*
         User Validations

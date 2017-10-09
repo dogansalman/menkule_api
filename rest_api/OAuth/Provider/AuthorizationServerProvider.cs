@@ -4,6 +4,7 @@ using System.Security.Claims;
 using rest_api.Context;
 using rest_api.Models;
 using System.Linq;
+using rest_api.Libary.Bcrypt;
 
 namespace rest_api.OAuth.Provider
 {
@@ -24,8 +25,8 @@ namespace rest_api.OAuth.Provider
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
 
             // Kullanıcının access_token alabilmesi için gerekli validation işlemlerini yapıyoruz.
-
-            Users usr = db.users.Where(u => u.email == context.UserName && u.password == context.Password).FirstOrDefault();
+            string pass = Bcrypt.hash(context.Password);
+            Users usr = db.users.Where(u => u.email == context.UserName && u.password == pass).FirstOrDefault();
             if (usr != null)
             {
                 var identity = new ClaimsIdentity(context.Options.AuthenticationType);
