@@ -199,6 +199,7 @@
     <Compile Include="ModelViews\AdvertCommentMV.cs" />
     <Compile Include="ModelViews\AdvertImagesMW.cs" />
     <Compile Include="ModelViews\MessageMV.cs" />
+    <Compile Include="ModelViews\UserApproveMV.cs" />
     <Compile Include="ModelViews\UserCommentMV.cs" />
     <Compile Include="ModelViews\UsersMV.cs" />
     <Compile Include="OAuth\Startup.cs" />

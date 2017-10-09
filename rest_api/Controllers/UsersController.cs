@@ -87,7 +87,11 @@ namespace rest_api.Controllers
             return Ok(user);
         }
 
-        // Validate GSM
+    
+        /*
+        User Validations
+             */
+        // Gsm
         [HttpGet]
         [Authorize]
         [Route("validate/gsm")]
@@ -100,7 +104,7 @@ namespace rest_api.Controllers
             return Ok();
         }
 
-        // Validate Email
+        // Email
         [HttpGet]
         [Authorize]
         [Route("validate/mail")]
@@ -113,10 +117,13 @@ namespace rest_api.Controllers
             return Ok();
         }
 
+        /*
+           User Approve
+                */
         //Ownershiping
         [HttpPost]
         [Authorize]
-        [Route("ownership/approve")]
+        [Route("approve/ownership")]
         public IHttpActionResult ownerApprove()
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
@@ -136,5 +143,53 @@ namespace rest_api.Controllers
             return Ok();
         }
 
+        // Gsm
+        [HttpPost]
+        [Authorize]
+        [Route("approve/gsm")]
+        public IHttpActionResult approveGsm([FromBody] UserApproveMV userApproved)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            Users user = db.users.Where(u => u.id == user_id && u.gsm_activation_code == userApproved.code).FirstOrDefault();
+            if (user == null) return NotFound();
+            user.gsm_state = true;
+            user.state = true;
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (System.Exception e)
+            {
+                ExceptionHandler.Handle(e);
+            }
+            return Ok();
+        }
+
+
+        //Note: this function is not using.
+        // Mail
+        [HttpPost]
+        [Authorize]
+        [Route("approve/mail")]
+        public IHttpActionResult approveMail([FromBody] UserApproveMV userApproved)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            Users user = db.users.Where(u => u.id == user_id && u.email_activation_code == userApproved.code).FirstOrDefault();
+            if (user == null) return NotFound();
+            user.email_state = true;
+            try
+            {
+                //db.SaveChanges();
+            }
+            catch (System.Exception e)
+            {
+                ExceptionHandler.Handle(e);
+            }
+            return Ok();
+        }
     }
 }
