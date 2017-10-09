@@ -112,5 +112,29 @@ namespace rest_api.Controllers
             if (!db.users.Any(u => u.email_state == true && u.id == user_id)) Responser.Response(HttpStatusCode.Forbidden, "E-mail not approved");
             return Ok();
         }
+
+        //Ownershiping
+        [HttpPost]
+        [Authorize]
+        [Route("ownership/approve")]
+        public IHttpActionResult ownerApprove()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            Users user = db.users.Find(user_id);
+            if (user == null) return NotFound();
+            user.ownershiping = true;
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (System.Exception e)
+            {
+                ExceptionHandler.Handle(e);
+            }
+            return Ok();
+        }
+
     }
 }
