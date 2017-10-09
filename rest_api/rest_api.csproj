@@ -162,6 +162,7 @@
     <Compile Include="Controllers\AdvertTypesController.cs" />
     <Compile Include="Controllers\CitiesController.cs" />
     <Compile Include="Controllers\FeedbacksController.cs" />
+    <Compile Include="Controllers\LibaryController\MailSenderController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\Gender.cs" />
     <Compile Include="Filters\IpAdress.cs" />
@@ -170,6 +171,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Libary\Exceptions\ExceptionHandler.cs" />
+    <Compile Include="Libary\MailSender\MailSender.cs" />
     <Compile Include="Libary\Responser\Responser.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\MigrationContexts.cs" />
@@ -196,6 +198,7 @@
     <Compile Include="ModelViews\AdvertAvaiableDatesMW.cs" />
     <Compile Include="ModelViews\AdvertCommentMV.cs" />
     <Compile Include="ModelViews\AdvertImagesMW.cs" />
+    <Compile Include="ModelViews\MessageMV.cs" />
     <Compile Include="ModelViews\UserCommentMV.cs" />
     <Compile Include="ModelViews\UsersMV.cs" />
     <Compile Include="OAuth\Startup.cs" />

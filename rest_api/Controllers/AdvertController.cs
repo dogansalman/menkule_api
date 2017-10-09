@@ -167,7 +167,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult update([FromBody] Advert advert, int id)
         {
-            //TODO update  images avaiable_date unaviabla_date
+            //TODO update  images 
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -181,7 +181,11 @@ namespace rest_api.Controllers
             AdvertProperties ap = db.advert_properties.Where(app => app.advert_id == id).First();
             db.Entry(advert.properties).State = System.Data.Entity.EntityState.Detached;
 
-         
+            db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
+            db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(ud => ud.advert_id == id));
+
+            db.SaveChanges();
+
             using (var dbContext = new DatabaseContext())
             {
                 //Advert
@@ -203,8 +207,31 @@ namespace rest_api.Controllers
                 advert.properties.updated_date = DateTime.Now;
                 dbContext.Entry(advert.properties).State = System.Data.Entity.EntityState.Modified;
 
+                //Unavaiable Dates
+                advert.unavaiable_date.ToList().ForEach(i => {
+                    i.advert_id = advert.id;
+                    dbContext.advert_unavaiable_dates.Add(i);
+                });
+
+                //Avaiable Dates
+                advert.available_date.ToList().ForEach(ad =>
+                {
+                    for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
+                    {
+                        AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
+                        {
+                            day = date.Day,
+                            month = date.Month,
+                            year = date.Year,
+                            fulldate = date,
+                            uniq = String.Format("{0:MMddyyyy}", ad.from) + String.Format("{0:MMddyyyy}", ad.to),
+                            advert_id = advert.id
+                        };
+                        dbContext.advert_avaiable_dates.Add(avaiableDate);
+                    }
+                });
+
                 dbContext.SaveChanges();
-   
             }
 
             return Ok(advert);
