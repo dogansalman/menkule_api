@@ -24,7 +24,7 @@ namespace rest_api.Models
         public string lastname
         {
             get { return _lastname; }
-            set { _lastname = value; }
+            set { _lastname = value.ToLower(); }
         }
         private string _email;
         [Required]

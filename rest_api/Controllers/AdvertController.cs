@@ -53,10 +53,15 @@ namespace rest_api.Controllers
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-
+            
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             advert.user_id = user_id;
+            advert.score = 0;
+            advert.state = false;
+            advert.views = 0;
+            advert.created_date = DateTime.Now;
+            advert.updated_date = null;
 
             db.advert.Add(advert);
             db.SaveChanges();
@@ -194,6 +199,10 @@ namespace rest_api.Controllers
                 advert.updated_date = DateTime.Now;
                 advert.state = false;
                 dbContext.Entry(advert).State = System.Data.Entity.EntityState.Modified;
+                dbContext.Entry(advert).Property("score").IsModified = false;
+                dbContext.Entry(advert).Property("views").IsModified = false;
+                dbContext.Entry(advert).Property("user_id").IsModified = false;
+                dbContext.Entry(advert).Property("state").IsModified = false;
 
                 //Possibilities
                 advert.possibility.advert_id = advert.id;

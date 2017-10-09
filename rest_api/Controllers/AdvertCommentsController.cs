@@ -61,8 +61,6 @@ namespace rest_api.Controllers
             if (!db.advert.Any(a => a.id == advertComments.advert_id)) return NotFound();
 
             advertComments.user_id = user_id;
-            advertComments.comment = advertComments.comment;
-            advertComments.advert_id = advertComments.advert_id;
             db.advert_comments.Add(advertComments);
 
             try

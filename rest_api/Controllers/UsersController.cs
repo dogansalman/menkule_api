@@ -8,6 +8,8 @@ using rest_api.ModelViews;
 using rest_api.Libary.Exceptions;
 using rest_api.Libary.Responser;
 using rest_api.Libary.Bcrypt;
+using System;
+
 namespace rest_api.Controllers
 {
   
@@ -21,19 +23,37 @@ namespace rest_api.Controllers
         [Route("")]
         public IHttpActionResult add([FromBody] Users user)
         {
+            //validation
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.Forbidden, "e-posta adresi kullanılmaktadır.");
-            if (db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.Forbidden, "gsm no kullanılmaktadır.");
+            if (db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.BadRequest, "e-posta adresi kullanılmaktadır.");
+            if (db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.BadRequest, "gsm no kullanılmaktadır.");
 
-            //hash password
-            user.password = Bcrypt.hash(user.password);
-            db.users.Add(user);
+            //generate activation code
+            Random rnd = new Random();
+            string gsm_code = rnd.Next(9999, 999999).ToString();
+            string email_code = rnd.Next(9999, 999999).ToString();
+
+            //create user
+            Users userData = new Users {
+                name = user.name,
+                lastname = user.lastname,
+                email = user.email,
+                gender = user.gender,
+                gsm = user.gsm,
+                description = user.description,
+                password = Bcrypt.hash(user.password),
+                source = "web",
+                email_activation_code = email_code,
+                gsm_activation_code = gsm_code
+            };
+            //insert user
+            db.users.Add(userData);
 
             try
             {
                 db.SaveChanges();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 ExceptionHandler.Handle(ex);
             }
@@ -91,9 +111,31 @@ namespace rest_api.Controllers
         }
 
         //Update Password
-        [HttpPost]
+        [HttpPut]
         [Authorize]
         [Route("password")]
+        public IHttpActionResult changepas([FromBody] UserPasswordMV password)
+        {
+            if (password.password != password.reply) return BadRequest();
+
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            string pas = Bcrypt.hash(password.currentpassword);
+          
+            Users user = db.users.Where(u => u.id == user_id && u.password == pas).FirstOrDefault();
+            if (user == null) return NotFound();
+            
+            user.password = Bcrypt.hash(password.password);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+            return Ok();
+        }
     
         /*
         User Validations
