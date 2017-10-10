@@ -262,16 +262,15 @@ namespace rest_api.Controllers
                 TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.gsm_last_update);
                 if (diff.TotalHours >= 1) return BadRequest();
             }
-           
 
             //generate activation code
             Random rnd = new Random();
             string gsm_code = rnd.Next(9999, 999999).ToString();
 
-            user.gsm_activation_code = gsm_code;
-
             try
             {
+                user.gsm_activation_code = gsm_code;
+                user.gsm_last_update = DateTime.Now;
                 db.SaveChanges();
             }
             catch (Exception ex)
