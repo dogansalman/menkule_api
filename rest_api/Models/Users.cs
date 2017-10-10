@@ -66,7 +66,6 @@ namespace rest_api.Models
         [StringLength(255)]
         public string description { get; set; }
         public DateTime? forgot_last_date { get; set; }
-        [Required]
         [StringLength(255)]
         public string password_token { get; set; }
         public DateTime created_date { get; set; } = DateTime.Now;

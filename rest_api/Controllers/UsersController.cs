@@ -11,7 +11,7 @@ using rest_api.Libary.Exceptions;
 using rest_api.Libary.Responser;
 using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
-
+using rest_api.Libary.NetGsm;
 
 namespace rest_api.Controllers
 {
@@ -21,6 +21,9 @@ namespace rest_api.Controllers
     {
         DatabaseContext db = new DatabaseContext();
      
+        /*
+         User create read update functions
+             */
         // Add
         [HttpPost]
         [Route("")]
@@ -62,7 +65,13 @@ namespace rest_api.Controllers
             {
                 ExceptionHandler.Handle(ex);
             }
-           
+            
+            //Send Gsm Activation Code
+            NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + gsm_code);
+
+            //Send Email Notification
+            Mailgun.Send("register", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname } }, user.email, "Üyeliğiniz için teşekkürler");
+
             return Ok(new UsersMV
             {
                 name = user.name,
@@ -114,6 +123,10 @@ namespace rest_api.Controllers
             if (user == null) return NotFound();
             return Ok(user);
         }
+
+        /*
+         User password  update forgot functions
+         */
 
         //Update Password
         [HttpPut]
@@ -172,6 +185,7 @@ namespace rest_api.Controllers
             return Ok();
         }
 
+        //Update Password with Token
         [HttpPost]
         [Route("password/reset/token")]
         public IHttpActionResult resetpas([FromBody] _TokenResetPassword _token)
@@ -182,8 +196,11 @@ namespace rest_api.Controllers
             Users user = db.users.Where(u => u.password_token == _token.token).FirstOrDefault();
             if (user == null) return NotFound();
 
-            TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.forgot_last_date);
-            if (diff.TotalHours >= 2) return BadRequest();
+            if (user.forgot_last_date != null)
+            {
+                TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.forgot_last_date);
+                if (diff.TotalHours >= 2) return BadRequest();
+            }
 
             try
             {
@@ -199,8 +216,9 @@ namespace rest_api.Controllers
         }
 
         /*
-        User Validations
+         User Gsm Email Validations Function
              */
+ 
         // Gsm
         [HttpGet]
         [Authorize]
@@ -227,10 +245,51 @@ namespace rest_api.Controllers
             return Ok();
         }
 
+        // Resend Gsm Activation Code
+        [HttpGet]
+        [Authorize]
+        [Route("validate/gsm/send")]
+        public IHttpActionResult resendGsmCode()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            Users user = db.users.Where(u => u.id == user_id).FirstOrDefault();
+            if (user == null) return NotFound();
+
+            if(user.gsm_last_update != null)
+            {
+                TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.gsm_last_update);
+                if (diff.TotalHours >= 1) return BadRequest();
+            }
+           
+
+            //generate activation code
+            Random rnd = new Random();
+            string gsm_code = rnd.Next(9999, 999999).ToString();
+
+            user.gsm_activation_code = gsm_code;
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+
+            //Send Gsm Activation Code
+            NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
+
+            return Ok();
+        }
+
         /*
-           User Approve
-                */
-        //Ownershiping
+         User Approve Ownership & Gsm & Email Functions 
+         */
+
+        // Ownershiping
         [HttpPost]
         [Authorize]
         [Route("approve/ownership")]
@@ -276,8 +335,7 @@ namespace rest_api.Controllers
             }
             return Ok();
         }
-
-
+    
         //Note: this function is not using.
         // Mail
         [HttpPost]
@@ -301,5 +359,7 @@ namespace rest_api.Controllers
             }
             return Ok();
         }
+
+      
     }
 }

@@ -153,6 +153,7 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="Libary\Mailgun\templates\forgot_password.html" />
+    <Content Include="Libary\Mailgun\templates\register.html" />
     <Content Include="LICENSE.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -184,6 +185,7 @@
     <Compile Include="Libary\JsonHelper\JsonHelper.cs" />
     <Compile Include="Libary\Mailgun\Mailgun.cs" />
     <Compile Include="Libary\MailSender\MailSender.cs" />
+    <Compile Include="Libary\NetGsm\NetGsm.cs" />
     <Compile Include="Libary\Responser\Responser.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\MigrationContexts.cs" />
