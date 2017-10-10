@@ -152,15 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="Libary\Mailgun\templates\TextTemplate1.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>TextTemplate1.txt</LastGenOutput>
-    </Content>
-    <Content Include="Libary\Mailgun\templates\TextTemplate1.txt">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TextTemplate1.tt</DependentUpon>
-    </Content>
+    <Content Include="Libary\Mailgun\templates\forgot_password.html" />
     <Content Include="LICENSE.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -219,8 +211,10 @@
     <Compile Include="ModelViews\AdvertCommentMV.cs" />
     <Compile Include="ModelViews\AdvertImagesMW.cs" />
     <Compile Include="ModelViews\MessageMV.cs" />
+    <Compile Include="ModelViews\_TokenResetPassword.cs" />
     <Compile Include="ModelViews\UserApproveMV.cs" />
     <Compile Include="ModelViews\UserCommentMV.cs" />
+    <Compile Include="ModelViews\UserMailMV.cs" />
     <Compile Include="ModelViews\UserPasswordMV.cs" />
     <Compile Include="ModelViews\UsersMV.cs" />
     <Compile Include="OAuth\Startup.cs" />

@@ -2,13 +2,16 @@
 using System.Net;
 using System.Web.Http;
 using System.Security.Claims;
+using System;
+using System.Collections.Generic;
 using rest_api.Models;
 using rest_api.Context;
 using rest_api.ModelViews;
 using rest_api.Libary.Exceptions;
 using rest_api.Libary.Responser;
 using rest_api.Libary.Bcrypt;
-using System;
+using rest_api.Libary.Mailgun;
+
 
 namespace rest_api.Controllers
 {
@@ -115,7 +118,7 @@ namespace rest_api.Controllers
         //Update Password
         [HttpPut]
         [Authorize]
-        [Route("password")]
+        [Route("password/reset")]
         public IHttpActionResult changepas([FromBody] UserPasswordMV password)
         {
             if (password.password != password.reply) return BadRequest();
@@ -138,7 +141,63 @@ namespace rest_api.Controllers
             }
             return Ok();
         }
-    
+
+        //Forgot Password
+        [HttpPost]
+        [Route("password/forgot")]
+        public IHttpActionResult forgotpas([FromBody] UserMailMV mail)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            Users user = db.users.Where(u => u.email == mail.email).FirstOrDefault();
+
+            if (user == null) return NotFound();
+
+            //generate password reset token
+            Random rnd = new Random();
+            string token = Bcrypt.hash(user.email + DateTime.Now.Hour + DateTime.Now.Millisecond + rnd.Next(999999, 999999));
+
+            try
+            {
+                user.forgot_last_date = DateTime.Now;
+                user.password_token = token;
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+            
+            Mailgun.Send("forgot_password", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname}, {"token", token } }, user.email, "Menkule Şifre Yenileme Talebiniz");
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("password/reset/token")]
+        public IHttpActionResult resetpas([FromBody] _TokenResetPassword _token)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (_token.password != _token.reply) return BadRequest();
+
+            Users user = db.users.Where(u => u.password_token == _token.token).FirstOrDefault();
+            if (user == null) return NotFound();
+
+            TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.forgot_last_date);
+            if (diff.TotalHours >= 2) return BadRequest();
+
+            try
+            {
+                user.password = Bcrypt.hash(_token.password);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+            
+            return Ok();
+        }
+
         /*
         User Validations
              */
