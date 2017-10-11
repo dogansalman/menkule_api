@@ -1,0 +1,67 @@
+﻿using System.Collections.Generic;
+using System.Web;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using System.IO;
+using rest_api.Libary.JsonHelper;
+using rest_api.Models;
+
+namespace rest_api.Libary.Cloudinary
+{
+
+    public static class Cloudinary
+    {
+        public static string imageRootUrl = "https://res.cloudinary.com/www-menkule-com-tr/image/upload/";
+        public static string noProfile = imageRootUrl + "no-profile_u5qcn9.png";
+        public static string emptyPhoto = imageRootUrl + "no-image_ibo9hw.jpg";
+        private static Account CloudAccount = new Account("www-menkule-com-tr", "574816954465322", "38oob_T9cFYt7qChDAmRj3zqgpQ");
+
+        public static Images upload(HttpContext context, string folder = "")
+        {
+            try
+            {
+                CloudinaryDotNet.Cloudinary cloudinary = new CloudinaryDotNet.Cloudinary(CloudAccount);
+                byte[] fileData = null;
+                using (var binaryReader = new BinaryReader(context.Request.InputStream))
+                {
+                    fileData = binaryReader.ReadBytes(context.Request.ContentLength);
+                };
+
+                using (MemoryStream memoryStream = new MemoryStream(fileData))
+                {
+                    ImageUploadParams uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription("advert images", memoryStream),
+                        Transformation = new Transformation().Crop("limit").Width(750).Height(750),
+                        Tags = "advert_image",
+                        Folder = folder
+
+                    };
+
+                    Dictionary<string, object> dic = JsonHelper.JsonHelper.ConvertJsonToDictionary(cloudinary.Upload(uploadParams).JsonObj.ToString());
+
+                    //add to database
+                    Images image = new Images();
+                    return image.add(getParam(dic, "public_id") + "." + getParam(dic, "format"));
+                };
+            }
+            catch (System.Exception ex)
+            {
+                return null;
+            }
+   
+
+        }
+
+        //get and check image url
+        public static object getParam(Dictionary<string, object> dict, string name)
+        {
+            if (dict.ContainsKey(name))
+            {
+                return dict[name];
+            }
+            return null;
+        }
+
+    }
+}

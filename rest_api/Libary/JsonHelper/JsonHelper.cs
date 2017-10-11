@@ -12,5 +12,9 @@ namespace rest_api.Libary.JsonHelper
             JavaScriptSerializer serializer = new JavaScriptSerializer();
             return serializer.Serialize(dictionaryData);
         }
+        public static Dictionary<string, object> ConvertJsonToDictionary(string json)
+        {
+            return new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(json);
+        }
     }
 }

@@ -12,6 +12,8 @@ using rest_api.Libary.Responser;
 using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace rest_api.Controllers
 {
@@ -424,6 +426,22 @@ namespace rest_api.Controllers
             return Ok();
         }
 
-      
+
+        /*
+         User Photos
+         */
+        [HttpPost]
+        [Authorize]
+        [Route("photo")]
+        public async Task<HttpResponseMessage> upload()
+        {
+            // Check if the request contains multipart / form - data.
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
     }
 }
