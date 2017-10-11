@@ -172,6 +172,7 @@
     <Compile Include="Controllers\CitiesController.cs" />
     <Compile Include="Controllers\FeedbacksController.cs" />
     <Compile Include="Controllers\LibaryController\MailSenderController.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\SuggestionsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\Gender.cs" />

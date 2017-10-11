@@ -161,6 +161,10 @@ namespace rest_api.Controllers
 
             db.SaveChanges();
 
+            //add notify
+            Notifications notify = new Notifications();
+            notify.add(user_id, "Üyelik bilgileriniz güncellendi.");
+
             try
             {
                
@@ -184,6 +188,7 @@ namespace rest_api.Controllers
                 created_date = user.created_date
             });
         }
+
         /*
          User password  update forgot functions
          */
