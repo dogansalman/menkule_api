@@ -2,7 +2,7 @@
 
 namespace rest_api.ModelViews
 {
-    public class UserMailMV
+    public class _Mail
     {
         [Required]
         [EmailAddress]

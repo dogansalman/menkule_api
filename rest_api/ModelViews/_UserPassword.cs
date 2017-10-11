@@ -2,7 +2,7 @@
 
 namespace rest_api.ModelViews
 {
-    public class UserPasswordMV
+    public class _UserPassword
     {
         [Required]
         [StringLength(255)]

@@ -54,7 +54,6 @@ namespace rest_api.Models
         public string gsm_activation_code { get; set; }
         [StringLength(5)]
         [Gender]
-        [Required]
         public string gender { get; set; }
         [StringLength(90)]
         public string source { get; set; }

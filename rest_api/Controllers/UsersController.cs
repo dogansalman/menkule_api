@@ -72,7 +72,7 @@ namespace rest_api.Controllers
             //Send Email Notification
             Mailgun.Send("register", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname } }, user.email, "Üyeliğiniz için teşekkürler");
 
-            return Ok(new UsersMV
+            return Ok(new _Users
             {
                 name = user.name,
                 lastname = user.lastname,
@@ -105,7 +105,7 @@ namespace rest_api.Controllers
                  .Where(u => u.user.id == user_id)
                  .SelectMany(userWithImage =>
                  userWithImage.image.DefaultIfEmpty(),
-                 (u, i) => new UsersMV
+                 (u, i) => new _Users
                  {
                      name = u.user.name,
                      lastname = u.user.lastname,
@@ -124,6 +124,66 @@ namespace rest_api.Controllers
             return Ok(user);
         }
 
+        // Put
+        [HttpPut]
+        [Route("")]
+        [Authorize]
+        public IHttpActionResult update([FromBody] Users user)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+
+            Users dbUser = db.users.Find(user_id);
+            if (dbUser == null) return NotFound();
+            if (dbUser.email != user.email && db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.BadRequest, "e-posta adresi kullanılmaktadır.");
+            if (dbUser.gsm != user.gsm && db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.BadRequest, "gsm no kullanılmaktadır.");
+
+            if (dbUser.gsm != user.gsm)
+            {
+                //generate activation code
+                Random rnd = new Random();
+                string gsm_code = rnd.Next(9999, 999999).ToString();
+
+                dbUser.state = false;
+                dbUser.gsm_state = false;
+                dbUser.gsm_activation_code = gsm_code;
+                
+                //send gsm activation code
+                NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
+            }
+
+            dbUser.gsm = user.gsm;
+            dbUser.email = user.email;
+            dbUser.name = user.name;
+            dbUser.lastname = user.lastname;
+            dbUser.updated_date = DateTime.Now;
+
+            db.SaveChanges();
+
+            try
+            {
+               
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.Handle(ex);
+            }
+            return Ok(new _Users
+            {
+                name = user.name,
+                lastname = user.lastname,
+                email = user.email,
+                gsm = user.gsm,
+                gender = user.gender,
+                photo = null,
+                ownershiping = user.ownershiping,
+                state = user.state,
+                email_state = user.email_state,
+                gsm_state = user.gsm_state,
+                created_date = user.created_date
+            });
+        }
         /*
          User password  update forgot functions
          */
@@ -132,7 +192,7 @@ namespace rest_api.Controllers
         [HttpPut]
         [Authorize]
         [Route("password/reset")]
-        public IHttpActionResult changepas([FromBody] UserPasswordMV password)
+        public IHttpActionResult changepas([FromBody] _UserPassword password)
         {
             if (password.password != password.reply) return BadRequest();
 
@@ -158,7 +218,7 @@ namespace rest_api.Controllers
         //Forgot Password
         [HttpPost]
         [Route("password/forgot")]
-        public IHttpActionResult forgotpas([FromBody] UserMailMV mail)
+        public IHttpActionResult forgotpas([FromBody] _Mail mail)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             Users user = db.users.Where(u => u.email == mail.email).FirstOrDefault();
@@ -315,7 +375,7 @@ namespace rest_api.Controllers
         [HttpPost]
         [Authorize]
         [Route("approve/gsm")]
-        public IHttpActionResult approveGsm([FromBody] UserApproveMV userApproved)
+        public IHttpActionResult approveGsm([FromBody] _Code userApproved)
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
@@ -340,7 +400,7 @@ namespace rest_api.Controllers
         [HttpPost]
         [Authorize]
         [Route("approve/mail")]
-        public IHttpActionResult approveMail([FromBody] UserApproveMV userApproved)
+        public IHttpActionResult approveMail([FromBody] _Code userApproved)
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);

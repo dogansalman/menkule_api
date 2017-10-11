@@ -10,7 +10,7 @@ namespace rest_api.Controllers.LibaryController
     {
         [HttpPost]
         [Route("")]
-        public IHttpActionResult send([FromBody]MessageMV message)
+        public IHttpActionResult send([FromBody]_Contact message)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (!MailSender.Send(message)) Responser.Response(HttpStatusCode.NotImplemented, "Mesajınız iletilemedi. Lütfen tekrar deneyin.");

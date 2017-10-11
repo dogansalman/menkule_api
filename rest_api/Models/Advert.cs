@@ -46,7 +46,7 @@ namespace rest_api.Models
         public DateTime? updated_date { get; set; }
         [NotMapped]
         [Required]
-        public ICollection<AdvertImagesMW> images { get; set; }
+        public ICollection<_AdvertImages> images { get; set; }
         [NotMapped]
         [Required]
         public AdvertProperties properties { get; set; }

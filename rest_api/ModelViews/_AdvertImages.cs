@@ -1,6 +1,6 @@
 ﻿namespace rest_api.ModelViews
 {
-    public class AdvertImagesMW
+    public class _AdvertImages
     {
         public int image_id { get; set; }
         public string url { get; set; }

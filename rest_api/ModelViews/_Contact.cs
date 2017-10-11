@@ -2,7 +2,7 @@
 
 namespace rest_api.ModelViews
 {
-    public class MessageMV
+    public class _Contact
     {
         [Required]
         [StringLength(255)]

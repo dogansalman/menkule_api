@@ -1,6 +1,6 @@
 ﻿namespace rest_api.ModelViews
 {
-    public class UsersMV
+    public class _Users
     {
         public string name { get; set; }
         public string lastname { get; set; }

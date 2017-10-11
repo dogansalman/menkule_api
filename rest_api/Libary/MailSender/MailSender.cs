@@ -5,7 +5,7 @@ namespace rest_api.Libary.MailSender
 {
     public static class MailSender
     {
-        public static bool Send(MessageMV mail)
+        public static bool Send(_Contact mail)
         {
             try
             {

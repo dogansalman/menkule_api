@@ -2,7 +2,7 @@
 
 namespace rest_api.ModelViews
 {
-    public class AdvertAvaiableDatesMW
+    public class _AdvertAvaiableDates
     {
         public DateTime from { get; set; }
         public int from_day { get; set; }

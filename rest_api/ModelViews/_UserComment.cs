@@ -1,6 +1,6 @@
 ﻿namespace rest_api.ModelViews
 {
-    public class UserCommentMV
+    public class _UserComment
     {
         public int id { get; set; }
         public string fullname { get; set; }

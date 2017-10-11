@@ -138,7 +138,7 @@ namespace rest_api.Controllers
                    into users
                    where c.advert_id == id && c.state == true
                    from img in users.DefaultIfEmpty()
-                   select new { comment = c, user = new UserCommentMV { id = u.id, fullname = u.name + " " + u.lastname, photo = img.url } };
+                   select new { comment = c, user = new _UserComment { id = u.id, fullname = u.name + " " + u.lastname, photo = img.url } };
 
         }
     }

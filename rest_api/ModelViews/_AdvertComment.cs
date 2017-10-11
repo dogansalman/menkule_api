@@ -5,7 +5,7 @@ using System.Web;
 
 namespace rest_api.ModelViews
 {
-    public class AdvertCommentMV
+    public class _AdvertComment
     {
         public int id { get; set; }
         public string comment { get; set; }
