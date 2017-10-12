@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Web;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Helpers;
 using System.Security.Claims;
+using System.Collections.Generic;
+using System.Web.UI.WebControls;
+using System.Web.Http.Description;
 using rest_api.Context;
 using rest_api.Models;
 using rest_api.Libary.Exceptions;
+using rest_api.Libary.Cloudinary;
 
 namespace rest_api.Controllers
 {
@@ -245,6 +251,33 @@ namespace rest_api.Controllers
 
             return Ok(advert);
 
+        }
+
+        //Photos
+        [HttpPost]
+        [Authorize]
+        [Route("photo")]
+        [ResponseType(typeof(FileUpload))]
+        public IHttpActionResult upload()
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            Users user = db.users.Find(user_id);
+
+            var httpRequest = HttpContext.Current.Request;
+            List<string> imageExt = new List<string> { { "jpg" }, { "png" }, { "jpeg" } };
+            var image = new WebImage(httpRequest.InputStream);
+            if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
+
+            image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 253, 93, "Right", "Bottom", 40, 10);
+
+            Images userImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
+            if (userImage == null) return BadRequest();
+
+            user.image_id = userImage.id;
+            db.SaveChanges();
+
+            return Ok(userImage);
         }
     }
 }

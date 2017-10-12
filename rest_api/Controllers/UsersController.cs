@@ -19,8 +19,6 @@ using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
 
 
-
-
 namespace rest_api.Controllers
 {
 
