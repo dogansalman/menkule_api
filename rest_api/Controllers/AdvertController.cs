@@ -178,7 +178,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult update([FromBody] Advert advert, int id)
         {
-            //TODO update  images 
+            
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -194,6 +194,35 @@ namespace rest_api.Controllers
 
             db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(ud => ud.advert_id == id));
+
+
+            advert.images.ToList().ForEach(i => {
+                if (i.is_new)
+                {
+                    AdvertImages ai = new AdvertImages()
+                    {
+                        advert_id = id,
+                        image_id = i.image_id,
+                        is_default = i.is_default
+                    };
+                    db.advert_images.Add(ai);
+                }
+                if (i.is_default)
+                {
+                    AdvertImages defaultImage = db.advert_images.Where(img => img.image_id == i.image_id && img.advert_id == id).FirstOrDefault();
+                    if (defaultImage != null) {
+
+                        db.advert_images.Where(ai => ai.advert_id == id).ToList().ForEach(ai => ai.is_default = false);
+                        defaultImage.is_default = true;
+                    } 
+                }
+                if (i.deleted)
+                {
+                    AdvertImages deletedImage = db.advert_images.Where(img => img.image_id == i.image_id && img.advert_id == id).FirstOrDefault();
+                    if (deletedImage != null) db.advert_images.Remove(db.advert_images.Find(i.image_id));
+                }
+            });
+            
 
             db.SaveChanges();
 
