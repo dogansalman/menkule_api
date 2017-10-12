@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Security.Claims;
-using System;
+using System.Web;
+using System.Web.Http.Description;
+using System.Web.UI.WebControls;
+using System.Web.Helpers;
 using System.Collections.Generic;
 using rest_api.Models;
 using rest_api.Context;
@@ -12,17 +16,19 @@ using rest_api.Libary.Responser;
 using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
-using System.Net.Http;
-using System.Threading.Tasks;
+using rest_api.Libary.Cloudinary;
+
+
+
 
 namespace rest_api.Controllers
 {
-  
+
     [RoutePrefix("users")]
     public class UsersController : ApiController
     {
         DatabaseContext db = new DatabaseContext();
-     
+
         /*
          User create read update functions
              */
@@ -42,7 +48,8 @@ namespace rest_api.Controllers
             string email_code = rnd.Next(9999, 999999).ToString();
 
             //create user 
-             Users userData = new Users {
+            Users userData = new Users
+            {
                 name = user.name,
                 lastname = user.lastname,
                 email = user.email,
@@ -54,7 +61,7 @@ namespace rest_api.Controllers
                 email_activation_code = email_code,
                 gsm_activation_code = gsm_code
             };
-            
+
 
             //insert user
             db.users.Add(userData);
@@ -67,7 +74,7 @@ namespace rest_api.Controllers
             {
                 ExceptionHandler.Handle(ex);
             }
-            
+
             //Send Gsm Activation Code
             NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + gsm_code);
 
@@ -150,7 +157,7 @@ namespace rest_api.Controllers
                 dbUser.state = false;
                 dbUser.gsm_state = false;
                 dbUser.gsm_activation_code = gsm_code;
-                
+
                 //send gsm activation code
                 NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
             }
@@ -169,7 +176,7 @@ namespace rest_api.Controllers
 
             try
             {
-               
+
             }
             catch (Exception ex)
             {
@@ -206,10 +213,10 @@ namespace rest_api.Controllers
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             string pas = Bcrypt.hash(password.currentpassword);
-          
+
             Users user = db.users.Where(u => u.id == user_id && u.password == pas).FirstOrDefault();
             if (user == null) return NotFound();
-            
+
             user.password = Bcrypt.hash(password.password);
             try
             {
@@ -246,8 +253,8 @@ namespace rest_api.Controllers
             {
                 ExceptionHandler.Handle(ex);
             }
-            
-            Mailgun.Send("forgot_password", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname}, {"token", token } }, user.email, "Menkule Şifre Yenileme Talebiniz");
+
+            Mailgun.Send("forgot_password", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname }, { "token", token } }, user.email, "Menkule Şifre Yenileme Talebiniz");
 
             return Ok();
         }
@@ -278,14 +285,14 @@ namespace rest_api.Controllers
             {
                 ExceptionHandler.Handle(ex);
             }
-            
+
             return Ok();
         }
 
         /*
          User Gsm Email Validations Function
              */
- 
+
         // Gsm
         [HttpGet]
         [Authorize]
@@ -324,7 +331,7 @@ namespace rest_api.Controllers
             Users user = db.users.Where(u => u.id == user_id).FirstOrDefault();
             if (user == null) return NotFound();
 
-            if(user.gsm_last_update != null)
+            if (user.gsm_last_update != null)
             {
                 TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.gsm_last_update);
                 if (diff.TotalHours >= 1) return BadRequest();
@@ -401,7 +408,7 @@ namespace rest_api.Controllers
             }
             return Ok();
         }
-    
+
         //Note: this function is not using.
         // Mail
         [HttpPost]
@@ -433,15 +440,27 @@ namespace rest_api.Controllers
         [HttpPost]
         [Authorize]
         [Route("photo")]
-        public async Task<HttpResponseMessage> upload()
+        [ResponseType(typeof(FileUpload))]
+        public  IHttpActionResult upload()
         {
-            // Check if the request contains multipart / form - data.
-            if (!Request.Content.IsMimeMultipartContent())
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            Users user = db.users.Find(user_id);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var httpRequest = HttpContext.Current.Request;
+            List<string> imageExt = new List<string>{ { "jpg" }, { "png" }, { "jpeg" } };
+            var image = new WebImage(httpRequest.InputStream);
+            if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
+
+            image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 253, 93, "Right", "Bottom", 40, 10);
+         
+            Images userImage = Cloudinary.upload(image, "users/" + user.name + "-" + user.lastname + "-" + user.id);
+            if (userImage == null) return BadRequest();
+           
+            user.image_id = userImage.id;
+            db.SaveChanges();
+
+            return Ok(userImage);
         }
     }
 }
