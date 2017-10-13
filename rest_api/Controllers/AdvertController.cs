@@ -27,6 +27,7 @@ namespace rest_api.Controllers
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             return (from a in db.advert
+                    where a.user_id == user_id
                     from aimg in db.advert_images
                     where aimg.is_default == true && aimg.advert_id == a.id
                     join c in db.cities on a.city_id equals c.id

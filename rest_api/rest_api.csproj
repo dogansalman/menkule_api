@@ -176,6 +176,7 @@
     <Compile Include="Controllers\FeedbacksController.cs" />
     <Compile Include="Controllers\LibaryController\MailSenderController.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SuggestionsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\Gender.cs" />
@@ -217,7 +218,9 @@
     <Compile Include="Models\Users.cs" />
     <Compile Include="ModelViews\_AdvertAvaiableDates.cs" />
     <Compile Include="ModelViews\_AdvertComment.cs" />
+    <Compile Include="ModelViews\_AdvertSearch.cs" />
     <Compile Include="ModelViews\_Contact.cs" />
+    <Compile Include="ModelViews\_LatitudeLongitude.cs" />
     <Compile Include="ModelViews\_TokenResetPassword.cs" />
     <Compile Include="ModelViews\_Code.cs" />
     <Compile Include="ModelViews\_UserComment.cs" />
