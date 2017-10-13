@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Web.Http;
 using rest_api.Context;
-using rest_api.Models;
 using rest_api.ModelViews;
 
 namespace rest_api.Controllers
@@ -33,7 +28,7 @@ namespace rest_api.Controllers
                     join u in db.users on a.user_id equals u.id
                     join uimg in db.images on u.image_id equals uimg.id into j1
                     from j2 in j1.DefaultIfEmpty()
-   
+                    where a.state == true
                     select new _AdvertSearch {
                         adress = a.adress,
                         title = a.title,
