@@ -219,7 +219,7 @@ namespace rest_api.Controllers
                 if (i.deleted)
                 {
                     AdvertImages deletedImage = db.advert_images.Where(img => img.image_id == i.image_id && img.advert_id == id).FirstOrDefault();
-                    if (deletedImage != null) db.advert_images.Remove(db.advert_images.Find(i.image_id));
+                    if (deletedImage != null) db.advert_images.Remove(deletedImage);
                 }
             });
             
