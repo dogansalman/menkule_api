@@ -28,7 +28,8 @@ namespace rest_api.OAuth
                 TokenEndpointPath = new Microsoft.Owin.PathString("/auth/login"), // token alacağımız path'i belirtiyoruz
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 AllowInsecureHttp = true,
-                Provider = new AuthorizationServerProvider()
+                Provider = new AuthorizationServerProvider(),
+                RefreshTokenProvider = new SimpleRefreshTokenProvider()
             };
 
             // AppBuilder'a token üretimini gerçekleştirebilmek için ilgili authorization ayarlarımızı veriyoruz.
