@@ -7,8 +7,8 @@ namespace rest_api
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
-            var corsConfig = new EnableCorsAttribute("*", "*", "*");
+            //Enable Cors
+            var corsConfig = new EnableCorsAttribute("*", "*", "*") { SupportsCredentials = true };
             config.EnableCors(corsConfig);
 
             // Web API routes

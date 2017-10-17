@@ -4,6 +4,7 @@ using Microsoft.Owin.Security.OAuth;
 using Owin;
 using System;
 using System.Web.Http;
+using Microsoft.Owin.Cors;
 
 [assembly: OwinStartup(typeof(rest_api.OAuth.Startup))]
 namespace rest_api.OAuth
@@ -14,12 +15,10 @@ namespace rest_api.OAuth
         public void Configuration(IAppBuilder appBuilder)
         {
             HttpConfiguration httpConfiguration = new HttpConfiguration();
-
             ConfigureOAuth(appBuilder);
-
             WebApiConfig.Register(httpConfiguration);
-            appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             appBuilder.UseWebApi(httpConfiguration);
+            appBuilder.UseCors(CorsOptions.AllowAll);
 
         }
 
@@ -27,7 +26,7 @@ namespace rest_api.OAuth
         {
             OAuthAuthorizationServerOptions oAuthAuthorizationServerOptions = new OAuthAuthorizationServerOptions()
             {
-                TokenEndpointPath = new Microsoft.Owin.PathString("/auth/login"), // token alacağımız path'i belirtiyoruz
+                TokenEndpointPath = new PathString("/auth/login"), // token alacağımız path'i belirtiyoruz
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 AllowInsecureHttp = true,
                 Provider = new AuthorizationServerProvider(),
@@ -44,5 +43,6 @@ namespace rest_api.OAuth
             // Bir diğer tip ise MAC token'dır. OAuth 1.0 versiyonunda kullanılıyor, hem client'a, hemde server tarafına implementasyonlardan dolayı ek maliyet çıkartmaktadır. Bu maliyetin yanı sıra ise Bearer token'a göre kaynak alış verişinin biraz daha güvenli olduğu söyleniyor çünkü client her request'inde veriyi hmac ile imzalayıp verileri kriptolu bir şekilde göndermeleri gerektiği için.
             appBuilder.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
         }
+
     }
 }
