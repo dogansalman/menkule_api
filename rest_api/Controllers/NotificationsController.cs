@@ -25,7 +25,7 @@ namespace rest_api.Controllers
         }
 
         // Delete
-        [HttpGet]
+        [HttpDelete]
         [Route("{id}")]
         [Authorize]
         public IHttpActionResult delete(int id)

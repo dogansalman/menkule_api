@@ -27,7 +27,7 @@ namespace rest_api.Models
         public int user_id { get; set; }
         [StringLength(255)]
         public string title { get; set; }
-        public bool state { get; set; } = false;
+        public bool state { get; set; } = true;
         public DateTime created_date { get; set; } = DateTime.Now;
         public DateTime? updated_date { get; set; }
 
