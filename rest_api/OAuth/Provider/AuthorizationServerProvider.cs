@@ -33,7 +33,7 @@ namespace rest_api.OAuth.Provider
                 identity.AddClaim(new Claim("user_id", usr.id.ToString()));
 
                 //Role eklemek için
-                //identity.AddClaim(new Claim(ClaimTypes.Role, "user"));
+                if(usr.ownershiping) identity.AddClaim(new Claim(ClaimTypes.Role, "owner"));
                 context.Validated(identity);
             }
             else

@@ -19,7 +19,7 @@ namespace rest_api.Controllers
     {
         //Get
         DatabaseContext db = new DatabaseContext();
-        [Authorize]
+        [Authorize(Roles = "owner")]
         [HttpGet]
         [Route("")]
         public object get()
@@ -39,6 +39,7 @@ namespace rest_api.Controllers
 
         //Detail
         [HttpGet]
+        [Authorize(Roles = "owner")]
         [Route("{id}")]
         public IHttpActionResult detail(int id)
         {
@@ -53,8 +54,8 @@ namespace rest_api.Controllers
         }
 
         //Add
-        [Authorize]
         [HttpPost]
+        [Authorize(Roles = "owner")]
         [Route("")]
         public IHttpActionResult add([FromBody] Advert advert)
         {
@@ -135,7 +136,7 @@ namespace rest_api.Controllers
 
         //Delete
         [HttpDelete]
-        [Authorize]
+        [Authorize(Roles = "owner")]
         [Route("{id}")]
         public IHttpActionResult delete(int id)
         {
@@ -175,7 +176,7 @@ namespace rest_api.Controllers
 
         //Update
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "owner")]
         [Route("{id}")]
         public IHttpActionResult update([FromBody] Advert advert, int id)
         {
@@ -285,7 +286,7 @@ namespace rest_api.Controllers
 
         //Photos
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "owner")]
         [Route("photo")]
         [ResponseType(typeof(FileUpload))]
         public IHttpActionResult upload()
