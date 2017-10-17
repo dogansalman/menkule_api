@@ -18,7 +18,9 @@ namespace rest_api.OAuth
             ConfigureOAuth(appBuilder);
 
             WebApiConfig.Register(httpConfiguration);
+            appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             appBuilder.UseWebApi(httpConfiguration);
+
         }
 
         private void ConfigureOAuth(IAppBuilder appBuilder)
@@ -34,8 +36,6 @@ namespace rest_api.OAuth
 
             // AppBuilder'a token üretimini gerçekleştirebilmek için ilgili authorization ayarlarımızı veriyoruz.
             appBuilder.UseOAuthAuthorizationServer(oAuthAuthorizationServerOptions);
-            appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            
 
             // Authentication type olarak ise Bearer Authentication'ı kullanacağımızı belirtiyoruz.
             // Bearer token OAuth 2.0 ile gelen standartlaşmış token türüdür.
