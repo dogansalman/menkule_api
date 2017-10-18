@@ -41,16 +41,28 @@ namespace rest_api.Controllers
         [HttpGet]
         [Authorize(Roles = "owner")]
         [Route("{id}")]
-        public IHttpActionResult detail(int id)
+        public object detail(int id)
         {
-            Advert advert = db.advert.Find(id);
-            if (advert == null) return NotFound();
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
 
-            advert.properties = db.advert_properties.FirstOrDefault(ap => ap.advert_id == advert.id);
-            advert.possibility = db.advert_possibilities.FirstOrDefault(ap => ap.advert_id == advert.id);
-            advert.unavaiable_date = db.advert_unavaiable_dates.Where(aud => aud.advert_id == advert.id).ToList();
-            advert.available_date = db.advert_avaiable_dates.Where(aad => aad.advert_id == advert.id).ToList();
-            return Ok(advert);
+            return (from a in db.advert
+                    where a.user_id == user_id && a.id == id
+                    join p in db.advert_properties on a.id equals p.advert_id
+                    join pos in db.advert_possibilities on a.id equals pos.advert_id
+                    select new
+                    {
+                        advert = a,
+                        possibilities = pos,
+                        properties = p,
+                        available_date = (db.advert_avaiable_dates.Where(ad => ad.advert_id == id)).ToList(),
+                        unavailable_date = (db.advert_unavaiable_dates.Where(uad => uad.advert_id == id)).ToList(),
+                        images = (from ai in db.advert_images
+                                  where ai.advert_id == a.id
+                                  join i in db.images on ai.image_id equals i.id
+                                  select new { url = i.url, id = i.id, is_default = ai.is_default }
+                              ).ToList()
+                    }).FirstOrDefault();
         }
 
         //Add

@@ -46,7 +46,7 @@ namespace rest_api.Models
         [Index("IX_UserGsm", 2, IsUnique = true)]
         public string gsm { get; set; }
         public int? image_id { get; set; }
-        public bool email_state { get; set; } = false;
+        public bool email_state { get; set; } = true;
         public bool gsm_state { get; set; } = false;
         [StringLength(255)]
         public string email_activation_code { get; set; }

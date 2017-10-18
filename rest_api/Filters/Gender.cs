@@ -9,6 +9,7 @@ namespace rest_api.Filters
     {
        public override bool IsValid(object value)
         {
+            if (value == null) return true;
             if (value.ToString() == "Bay" || value.ToString() == "Bayan") return true;
             return false;
         }
