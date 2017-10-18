@@ -219,7 +219,6 @@
     <Compile Include="Models\Suggetions.cs" />
     <Compile Include="Models\Towns.cs" />
     <Compile Include="Models\Users.cs" />
-    <Compile Include="ModelViews\_Advert.cs" />
     <Compile Include="ModelViews\_AdvertAvaiableDates.cs" />
     <Compile Include="ModelViews\_AdvertComment.cs" />
     <Compile Include="ModelViews\_AdvertSearch.cs" />
