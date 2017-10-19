@@ -34,7 +34,32 @@ namespace rest_api.Controllers
                     join t in db.towns on a.town_id equals t.id
                     join at in db.advert_types on a.advert_type_id equals at.id
                     join img in db.images on aimg.image_id equals img.id
-                select new { advert = a, city = c.name, town = t.name, advert_type = at.name, image = img.url }).ToList();
+                    select new
+                    {
+                        advert = new
+                        {
+                            adress = a.adress,
+                            advert_type_id = a.advert_type_id,
+                            city_id = a.city_id,
+                            town_id = a.town_id,
+                            user_id = a.user_id,
+                            entry_time = a.entry_time,
+                            exit_time = a.exit_time,
+                            state = a.state,
+                            views = a.views,
+                            score = a.score,
+                            price = a.price,
+                            min_layover = a.min_layover,
+                            cancel_time = a.cancel_time,
+                            description = a.description,
+                            zoom = a.zoom,
+                            latitude = a.latitude,
+                            longitude = a.longitude,
+                            title = a.title,
+                            created_date = a.created_date,
+                            updated_date = a.updated_date
+                        }, city = c.name, town = t.name, advert_type = at.name, image = img.url })
+                        .ToList();
         }
 
         //Detail
@@ -52,7 +77,29 @@ namespace rest_api.Controllers
                     join pos in db.advert_possibilities on a.id equals pos.advert_id
                     select new
                     {
-                        advert = a,
+                        advert = new
+                        {
+                            adress = a.adress,
+                            advert_type_id = a.advert_type_id,
+                            city_id = a.city_id,
+                            town_id = a.town_id,
+                            user_id = a.user_id,
+                            entry_time = a.entry_time,
+                            exit_time = a.exit_time,
+                            state = a.state,
+                            views = a.views,
+                            score = a.score,
+                            price = a.price,
+                            min_layover = a.min_layover,
+                            cancel_time = a.cancel_time,
+                            description = a.description,
+                            zoom = a.zoom,
+                            latitude = a.latitude,
+                            longitude = a.longitude,
+                            title = a.title,
+                            created_date = a.created_date,
+                            updated_date = a.updated_date
+                        },
                         possibilities = pos,
                         properties = p,
                         available_date = (db.advert_avaiable_dates.Where(ad => ad.advert_id == id)).ToList(),
