@@ -8,7 +8,9 @@ namespace rest_api.Models
     {
         [Key]
         public int id { get; set; }
+        [Index("IX_AdvertImage", 1, IsUnique = true)]
         public int image_id { get; set; }
+        [Index("IX_AdvertImage", 2, IsUnique = true)]
         public int advert_id { get; set; }
         [NotMapped]
         public bool is_new { get; set; } = false;

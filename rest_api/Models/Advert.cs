@@ -23,7 +23,6 @@ namespace rest_api.Models
         public string entry_time { get; set; }
         [Required]
         public string exit_time { get; set; }
-        [Required]
         public bool state { get; set; } = false;
         public int views { get; set; }
         public int score { get; set; }
@@ -46,10 +45,7 @@ namespace rest_api.Models
         public DateTime? updated_date { get; set; }
         [NotMapped]
         [Required]
-        public ICollection<AdvertImages> images { get; set; }
-        [NotMapped]
-        [Required]
-        public object photos { get; set; }
+        public ICollection<_AdvertImages> images { get; set; }
         [NotMapped]
         [Required]
         public AdvertProperties properties { get; set; }
@@ -57,10 +53,8 @@ namespace rest_api.Models
         [Required]
         public AdvertPossibilities possibility { get; set; }
         [NotMapped]
-        [Required]
         public ICollection<AdvertUnavailableDate> unavaiable_date { get; set; }
         [NotMapped]
-        [Required]
         public ICollection<AdvertAvailableDate> available_date { get; set; }
       
 

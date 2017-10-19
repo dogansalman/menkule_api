@@ -38,6 +38,7 @@ namespace rest_api.Controllers
                     {
                         advert = new
                         {
+                            id = a.id,
                             adress = a.adress,
                             advert_type_id = a.advert_type_id,
                             city_id = a.city_id,
@@ -57,7 +58,8 @@ namespace rest_api.Controllers
                             longitude = a.longitude,
                             title = a.title,
                             created_date = a.created_date,
-                            updated_date = a.updated_date
+                            updated_date = a.updated_date,
+                            
                         }, city = c.name, town = t.name, advert_type = at.name, image = img.url })
                         .ToList();
         }
@@ -79,6 +81,7 @@ namespace rest_api.Controllers
                     {
                         advert = new
                         {
+                            id = a.id,
                             adress = a.adress,
                             advert_type_id = a.advert_type_id,
                             city_id = a.city_id,
@@ -140,7 +143,7 @@ namespace rest_api.Controllers
                     AdvertImages ai = new AdvertImages()
                     {
                         advert_id = advert.id,
-                        image_id = i.image_id,
+                        image_id = i.id,
                         is_default = i.is_default
                     };
                     db.advert_images.Add(ai);
@@ -156,28 +159,36 @@ namespace rest_api.Controllers
             db.advert_properties.Add(advert.properties);
 
             //Unavaiable Dates
-            advert.unavaiable_date.ToList().ForEach(i => {
-                i.advert_id = advert.id;
-                db.advert_unavaiable_dates.Add(i);
-            });
+            if(advert.unavaiable_date != null)
+            {
+                advert.unavaiable_date.ToList().ForEach(i => {
+                    i.advert_id = advert.id;
+                    db.advert_unavaiable_dates.Add(i);
+                });
+            }
+           
 
             //Avaiable Dates
-            advert.available_date.ToList().ForEach(ad =>
+            if(advert.available_date != null)
             {
-                for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
+                advert.available_date.ToList().ForEach(ad =>
                 {
-                    AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
+                    for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
                     {
-                        day = date.Day,
-                        month = date.Month,
-                        year = date.Year,
-                        fulldate = date,
-                        uniq = String.Format("{0:MMddyyyy}", ad.from) + String.Format("{0:MMddyyyy}", ad.to),
-                        advert_id = advert.id
-                    };
-                    db.advert_avaiable_dates.Add(avaiableDate);
-                }
-            });
+                        AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
+                        {
+                            day = date.Day,
+                            month = date.Month,
+                            year = date.Year,
+                            fulldate = date,
+                            uniq = String.Format("{0:MMddyyyy}", ad.from) + String.Format("{0:MMddyyyy}", ad.to),
+                            advert_id = advert.id
+                        };
+                        db.advert_avaiable_dates.Add(avaiableDate);
+                    }
+                });
+            }
+            
         
             
             try
@@ -256,21 +267,21 @@ namespace rest_api.Controllers
             db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(ud => ud.advert_id == id));
 
-
+            //Images
             advert.images.ToList().ForEach(i => {
                 if (i.is_new)
                 {
                     AdvertImages ai = new AdvertImages()
                     {
                         advert_id = id,
-                        image_id = i.image_id,
+                        image_id = i.id,
                         is_default = i.is_default
                     };
                     db.advert_images.Add(ai);
                 }
                 if (i.is_default)
                 {
-                    AdvertImages defaultImage = db.advert_images.Where(img => img.image_id == i.image_id && img.advert_id == id).FirstOrDefault();
+                    AdvertImages defaultImage = db.advert_images.Where(img => img.image_id == i.id && img.advert_id == id).FirstOrDefault();
                     if (defaultImage != null) {
 
                         db.advert_images.Where(ai => ai.advert_id == id).ToList().ForEach(ai => ai.is_default = false);
@@ -279,7 +290,7 @@ namespace rest_api.Controllers
                 }
                 if (i.deleted)
                 {
-                    AdvertImages deletedImage = db.advert_images.Where(img => img.image_id == i.image_id && img.advert_id == id).FirstOrDefault();
+                    AdvertImages deletedImage = db.advert_images.Where(img => img.image_id == i.id && img.advert_id == id).FirstOrDefault();
                     if (deletedImage != null) db.advert_images.Remove(deletedImage);
                 }
             });
@@ -313,29 +324,35 @@ namespace rest_api.Controllers
                 dbContext.Entry(advert.properties).State = System.Data.Entity.EntityState.Modified;
 
                 //Unavaiable Dates
-                advert.unavaiable_date.ToList().ForEach(i => {
-                    i.advert_id = advert.id;
-                    dbContext.advert_unavaiable_dates.Add(i);
-                });
+                if(advert.unavaiable_date != null)
+                {
+                    advert.unavaiable_date.ToList().ForEach(i => {
+                        i.advert_id = advert.id;
+                        dbContext.advert_unavaiable_dates.Add(i);
+                    });
+                }
 
                 //Avaiable Dates
-                advert.available_date.ToList().ForEach(ad =>
+                if(advert.available_date != null)
                 {
-                    for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
+                    advert.available_date.ToList().ForEach(ad =>
                     {
-                        AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
+                        for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
                         {
-                            day = date.Day,
-                            month = date.Month,
-                            year = date.Year,
-                            fulldate = date,
-                            uniq = String.Format("{0:MMddyyyy}", ad.from) + String.Format("{0:MMddyyyy}", ad.to),
-                            advert_id = advert.id
-                        };
-                        dbContext.advert_avaiable_dates.Add(avaiableDate);
-                    }
-                });
-
+                            AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
+                            {
+                                day = date.Day,
+                                month = date.Month,
+                                year = date.Year,
+                                fulldate = date,
+                                uniq = String.Format("{0:MMddyyyy}", ad.from) + String.Format("{0:MMddyyyy}", ad.to),
+                                advert_id = advert.id
+                            };
+                            dbContext.advert_avaiable_dates.Add(avaiableDate);
+                        }
+                    });
+                }
+                
                 dbContext.SaveChanges();
             }
 
