@@ -16,20 +16,18 @@ namespace rest_api.Controllers
         public object find([FromBody] _LatitudeLongitude cordinates)
         {
             return (from a in db.advert
-                    from aimg in db.advert_images
                     where a.latitude <= cordinates.lat && a.longitude <= cordinates.lng
-                    where aimg.is_default == true && aimg.advert_id == a.id
                     join c in db.cities on a.city_id equals c.id
                     join t in db.towns on a.town_id equals t.id
                     join p in db.advert_properties on a.id equals p.advert_id
                     join po in db.advert_possibilities on a.id equals po.advert_id
                     join at in db.advert_types on a.advert_type_id equals at.id
-                    join img in db.images on aimg.image_id equals img.id
                     join u in db.users on a.user_id equals u.id
                     join uimg in db.images on u.image_id equals uimg.id into j1
                     from j2 in j1.DefaultIfEmpty()
                     where a.state == true
-                    select new _AdvertSearch {
+                    select new {
+                        id = a.id,
                         adress = a.adress,
                         title = a.title,
                         latitude = a.latitude,
@@ -42,6 +40,14 @@ namespace rest_api.Controllers
                         score = a.score,
                         views = a.views,
                         price = a.price,
+                        images = (
+                            from ad in db.advert
+                            where ad.id == a.id
+                            from aimg in db.advert_images
+                            where aimg.is_default == true && aimg.advert_id == ad.id
+                            join img in db.images on aimg.image_id equals img.id
+                            select new {image = img}
+                            ).FirstOrDefault(),
                         city = c,
                         town = t,
                         possibility = po,
