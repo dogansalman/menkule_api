@@ -53,8 +53,9 @@ namespace rest_api.Libary.Socket
         {
             var key = "qQrsBccsx0KHjPOuXOYg5sMeJ1GT0uFiwDVvVBrs";
             var cts2 = new CancellationToken();
+
             /*
-               socket.Options.SetRequestHeader("X-Secret-Key", key);
+            socket.Options.SetRequestHeader("X-Secret-Key", key);
             socket.Options.SetRequestHeader("ContentType", "application/json; charset=utf-8");
             string wsUri = string.Format("https://ws.menkule.com.tr/emit");
             await socket.ConnectAsync(new Uri(wsUri), cts2);
