@@ -181,6 +181,7 @@
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SuggestionsController.cs" />
+    <Compile Include="Controllers\UnavailableDateController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\Gender.cs" />
     <Compile Include="Filters\IpAdress.cs" />

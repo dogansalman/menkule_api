@@ -40,9 +40,6 @@ namespace rest_api.Controllers
                         {
                             id = a.id,
                             adress = a.adress,
-                            advert_type_id = a.advert_type_id,
-                            city_id = a.city_id,
-                            town_id = a.town_id,
                             user_id = a.user_id,
                             entry_time = a.entry_time,
                             exit_time = a.exit_time,
@@ -52,7 +49,6 @@ namespace rest_api.Controllers
                             price = a.price,
                             min_layover = a.min_layover,
                             cancel_time = a.cancel_time,
-                            description = a.description,
                             zoom = a.zoom,
                             latitude = a.latitude,
                             longitude = a.longitude,
@@ -60,7 +56,8 @@ namespace rest_api.Controllers
                             created_date = a.created_date,
                             updated_date = a.updated_date,
                             
-                        }, city = c.name, town = t.name, advert_type = at.name, image = img.url })
+                        },
+                        city = c, town = t, advert_type = at, image = img.url })
                         .ToList();
         }
 
@@ -83,9 +80,6 @@ namespace rest_api.Controllers
                         {
                             id = a.id,
                             adress = a.adress,
-                            advert_type_id = a.advert_type_id,
-                            city_id = a.city_id,
-                            town_id = a.town_id,
                             user_id = a.user_id,
                             entry_time = a.entry_time,
                             exit_time = a.exit_time,
@@ -105,7 +99,20 @@ namespace rest_api.Controllers
                         },
                         possibilities = pos,
                         properties = p,
-                        available_date = (db.advert_avaiable_dates.Where(ad => ad.advert_id == id)).ToList(),
+                        city = (db.cities.Where(c => c.id == a.city_id)).FirstOrDefault(),
+                        town = (db.towns.Where(t => t.id == a.town_id)).FirstOrDefault(),
+                        advert_type = (db.advert_types.Where(at => at.id == a.advert_type_id)).FirstOrDefault(),
+                        available_date = (
+                            from ad in db.advert_avaiable_dates
+                            where ad.advert_id == id
+                            group ad by ad.uniq into g
+                                select new
+                                {
+                                    from_date = g.Min(e => e.fulldate),
+                                    to_date = g.Max(e => e.fulldate),
+                                    uniq = g.Select(a => a.uniq).FirstOrDefault()
+                                }
+                            ).ToList(),
                         unavailable_date = (db.advert_unavaiable_dates.Where(uad => uad.advert_id == id)).ToList(),
                         images = (from ai in db.advert_images
                                   where ai.advert_id == a.id
@@ -173,7 +180,7 @@ namespace rest_api.Controllers
             {
                 advert.available_date.ToList().ForEach(ad =>
                 {
-                    for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
+                    for (DateTime date = ad.from_fulldate; date.Date <= ad.to_fulldate.Date; date = date.AddDays(1))
                     {
                         AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
                         {
@@ -181,7 +188,7 @@ namespace rest_api.Controllers
                             month = date.Month,
                             year = date.Year,
                             fulldate = date,
-                            uniq = String.Format("{0:MMddyyyy}", ad.from) + String.Format("{0:MMddyyyy}", ad.to),
+                            uniq = String.Format("{0:MMddyyyy}", ad.from_fulldate) + String.Format("{0:MMddyyyy}", ad.to_fulldate),
                             advert_id = advert.id
                         };
                         db.advert_avaiable_dates.Add(avaiableDate);
@@ -337,7 +344,7 @@ namespace rest_api.Controllers
                 {
                     advert.available_date.ToList().ForEach(ad =>
                     {
-                        for (DateTime date = ad.from; date.Date <= ad.to.Date; date = date.AddDays(1))
+                        for (DateTime date = ad.from_fulldate; date.Date <= ad.to_fulldate.Date; date = date.AddDays(1))
                         {
                             AdvertAvailableDate avaiableDate = new AdvertAvailableDate()
                             {
