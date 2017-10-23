@@ -79,20 +79,22 @@ namespace rest_api.Controllers
             //Send Email Notification
             Mailgun.Send("register", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname } }, user.email, "Üyeliğiniz için teşekkürler");
 
-            return Ok(new _Users
+
+            return Ok(new
             {
                 name = user.name,
                 lastname = user.lastname,
                 email = user.email,
                 gsm = user.gsm,
                 gender = user.gender,
-                photo = null,
+                photo = "",
                 ownershiping = user.ownershiping,
                 state = user.state,
                 email_state = user.email_state,
                 gsm_state = user.gsm_state,
                 created_date = user.created_date
             });
+            
         }
 
         // Get
@@ -112,8 +114,7 @@ namespace rest_api.Controllers
                  .Where(u => u.user.id == user_id)
                  .SelectMany(userWithImage =>
                  userWithImage.image.DefaultIfEmpty(),
-                 (u, i) => new _Users
-                 {
+                 (u, i) => new {
                      name = u.user.name,
                      lastname = u.user.lastname,
                      email = u.user.email,
@@ -121,6 +122,16 @@ namespace rest_api.Controllers
                      gender = u.user.gender,
                      photo = i.url,
                      ownershiping = u.user.ownershiping,
+                     advert_size = (
+                     from ad in db.advert
+                     where ad.user_id == u.user.id
+                     select(ad)
+                     ).Count(),
+                     notification_size = (
+                     from ntf in db.notifications
+                     where ntf.user_id == u.user.id && ntf.state == false
+                     select (ntf)
+                     ).Count(),
                      state = u.user.state,
                      email_state = u.user.email_state,
                      gsm_state = u.user.gsm_state,
@@ -180,14 +191,13 @@ namespace rest_api.Controllers
             {
                 ExceptionHandler.Handle(ex);
             }
-            return Ok(new _Users
-            {
+            return Ok(new {
                 name = user.name,
                 lastname = user.lastname,
                 email = user.email,
                 gsm = user.gsm,
                 gender = user.gender,
-                photo = null,
+                photo = "",
                 ownershiping = user.ownershiping,
                 state = user.state,
                 email_state = user.email_state,

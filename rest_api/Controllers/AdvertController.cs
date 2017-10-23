@@ -393,5 +393,74 @@ namespace rest_api.Controllers
 
             return Ok(userImage);
         }
+
+        //Search Find
+        [HttpGet]
+        [Route("find/{id}")]
+        public object find(int id)
+        {
+
+
+            return (from a in db.advert
+                    where a.state == true
+                    join p in db.advert_properties on a.id equals p.advert_id
+                    join pos in db.advert_possibilities on a.id equals pos.advert_id
+                    join u in db.users on a.user_id equals u.id
+                    join uimg in db.images on u.image_id equals uimg.id into j1
+                    from j2 in j1.DefaultIfEmpty()
+                    select new
+                    {
+                        advert = new
+                        {
+                            id = a.id,
+                            adress = a.adress,
+                            user_id = a.user_id,
+                            entry_time = a.entry_time,
+                            exit_time = a.exit_time,
+                            state = a.state,
+                            views = a.views,
+                            score = a.score,
+                            price = a.price,
+                            min_layover = a.min_layover,
+                            cancel_time = a.cancel_time,
+                            description = a.description,
+                            zoom = a.zoom,
+                            latitude = a.latitude,
+                            longitude = a.longitude,
+                            title = a.title,
+                            created_date = a.created_date,
+                            updated_date = a.updated_date
+                        },
+                        possibilities = pos,
+                        properties = p,
+                        city = (db.cities.Where(c => c.id == a.city_id)).FirstOrDefault(),
+                        town = (db.towns.Where(t => t.id == a.town_id)).FirstOrDefault(),
+                        advert_type = (db.advert_types.Where(at => at.id == a.advert_type_id)).FirstOrDefault(),
+                        available_date = (
+                            from ad in db.advert_avaiable_dates
+                            where ad.advert_id == id
+                            group ad by ad.uniq into g
+                            select new
+                            {
+                                from_date = g.Min(e => e.fulldate),
+                                to_date = g.Max(e => e.fulldate),
+                                uniq = g.Select(a => a.uniq).FirstOrDefault()
+                            }
+                            ).ToList(),
+                        unavailable_date = (db.advert_unavaiable_dates.Where(uad => uad.advert_id == id)).ToList(),
+                        images = (from ai in db.advert_images
+                                  where ai.advert_id == a.id
+                                  join i in db.images on ai.image_id equals i.id
+                                  select new { url = i.url, id = i.id, is_default = ai.is_default }
+                              ).ToList(),
+                        //comments = (db.advert_comments.Where(ac => ac.advert_id == id && ac.state == true)),
+                        comments = (
+                        from com in db.advert_comments
+                        where com.advert_id == id && com.state == true
+                        select new {comment = com, user = new { id = u.id, fullname = u.name + " " + u.lastname, photo = j2.url } }
+                                    ).Take(10).ToList(),
+                        user = new { id = u.id, fullname = u.name + " " + u.lastname, photo = j2.url, created_date = u.created_date, state = u.state }
+                    }).FirstOrDefault();
+        }
     }
 }

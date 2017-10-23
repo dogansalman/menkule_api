@@ -126,20 +126,5 @@ namespace rest_api.Controllers
 
         }
 
-
-        // Get Advert Comments
-        [HttpGet]
-        [Route("advert/{id}")]
-        public object get(int id)
-        {
-            return from c in db.advert_comments
-                   join u in db.users on c.user_id equals u.id
-                   join i in db.images on u.image_id equals i.id
-                   into users
-                   where c.advert_id == id && c.state == true
-                   from img in users.DefaultIfEmpty()
-                   select new { comment = c, user = new _UserComment { id = u.id, fullname = u.name + " " + u.lastname, photo = img.url } };
-
-        }
     }
 }
