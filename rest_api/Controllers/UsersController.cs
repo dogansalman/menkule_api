@@ -115,6 +115,7 @@ namespace rest_api.Controllers
                  .SelectMany(userWithImage =>
                  userWithImage.image.DefaultIfEmpty(),
                  (u, i) => new {
+                     id = u.user.id,
                      name = u.user.name,
                      lastname = u.user.lastname,
                      email = u.user.email,
