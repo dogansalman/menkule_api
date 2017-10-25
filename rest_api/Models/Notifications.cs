@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using rest_api.Context;
+using rest_api.Libary.Socket;
 
 namespace rest_api.Models
 {
     public class Notifications
     {
-        public void add(int user_id, string title)
+        public  void add(int user_id, string title)
         {
             using (var db = new DatabaseContext())
             {
@@ -18,6 +19,7 @@ namespace rest_api.Models
                     state = false
                 };
                 db.notifications.Add(notify);
+                Socket.Emit(user_id, "notification", notify);
                 db.SaveChanges();
             }
         }

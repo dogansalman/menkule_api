@@ -10,13 +10,14 @@ namespace rest_api.Controllers
     public class CitiesController : ApiController
     {
         DatabaseContext db = new DatabaseContext();
+
         [HttpGet]
-  
         [Route("")]
         public List<Cities> cities()
         {
             return db.cities.ToList();
         }
+
         [HttpGet]
         [Route("{id}")]
         public List<Towns> towns(int id)
