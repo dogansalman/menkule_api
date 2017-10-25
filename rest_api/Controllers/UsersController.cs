@@ -461,8 +461,6 @@ namespace rest_api.Controllers
             var image = new WebImage(httpRequest.InputStream);
             if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
 
-            image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 253, 93, "Right", "Bottom", 40, 10);
-         
             Images userImage = Cloudinary.upload(image, "users/" + user.name + "-" + user.lastname + "-" + user.id);
             if (userImage == null) return BadRequest();
            
