@@ -385,13 +385,10 @@ namespace rest_api.Controllers
 
             image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
 
-            Images userImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
-            if (userImage == null) return BadRequest();
-
-            user.image_id = userImage.id;
-            db.SaveChanges();
-
-            return Ok(userImage);
+            Images advertImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
+            if (advertImage == null) return BadRequest();
+            
+            return Ok(advertImage);
         }
 
         //Search Find
