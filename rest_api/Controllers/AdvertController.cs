@@ -276,7 +276,7 @@ namespace rest_api.Controllers
 
             //Images
             advert.images.ToList().ForEach(i => {
-                if (i.is_new)
+                if (i.is_new && !db.advert_images.Any(ai => ai.advert_id == id && ai.image_id == i.id))
                 {
                     AdvertImages ai = new AdvertImages()
                     {
@@ -316,7 +316,6 @@ namespace rest_api.Controllers
                 dbContext.Entry(advert).Property("score").IsModified = false;
                 dbContext.Entry(advert).Property("views").IsModified = false;
                 dbContext.Entry(advert).Property("user_id").IsModified = false;
-                dbContext.Entry(advert).Property("state").IsModified = false;
 
                 //Possibilities
                 advert.possibility.advert_id = advert.id;
@@ -399,7 +398,7 @@ namespace rest_api.Controllers
 
 
             return (from a in db.advert
-                    where a.state == true
+                    where a.state == true && a.id == id
                     join p in db.advert_properties on a.id equals p.advert_id
                     join pos in db.advert_possibilities on a.id equals pos.advert_id
                     join u in db.users on a.user_id equals u.id
