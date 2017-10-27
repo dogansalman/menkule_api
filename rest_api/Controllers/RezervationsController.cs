@@ -97,7 +97,7 @@ namespace rest_api.Controllers
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-
+            
             var rezervation = (
                            from r in db.rezervations
                            where r.owner == user_id || r.user_id == user_id
@@ -127,6 +127,10 @@ namespace rest_api.Controllers
                                updated_date = r.updated_date,
                                rezervation_advert = new _RezervationAdvert {
                                    advert = ra,
+                                   images = (from aimg in db.advert_images where aimg.advert_id == r.advert_id join img in db.images on aimg.image_id equals img.id select new {
+                                       id = img.id,
+                                       url = img.url
+                                   }).ToList(),
                                    advert_type = at,
                                    cities = c,
                                    possibilities = pos,

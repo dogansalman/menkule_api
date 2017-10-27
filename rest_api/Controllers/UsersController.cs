@@ -103,6 +103,7 @@ namespace rest_api.Controllers
         [Route("")]
         public IHttpActionResult get()
         {
+
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             var user = db.users.GroupJoin(

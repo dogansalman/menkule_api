@@ -11,6 +11,7 @@ namespace rest_api.ModelViews
         public RezervationAdverts advert { get; set; }
         public AdvertPossibilities possibilities { get; set; }
         public AdvertProperties properties { get; set; }
+        public object images { get; set; }
         public Cities cities { get; set; }
         public Towns towns { get; set; }
         public AdvertTypes advert_type { get; set; }
@@ -43,6 +44,7 @@ namespace rest_api.ModelViews
         public _RezervationAdvert rezervation_advert { get; set; }
         public List<RezervationVisitors> visitors { get; set; }
         public _RezervationUserInfo user_information { get; set; }
+       
 
     }
 }
