@@ -133,18 +133,16 @@ namespace rest_api.Controllers
                                    properties = p,
                                    towns = t
                                },
-                               visitors = (db.rezervation_visitors.Where(v => v.rezervation_id == r.id)).ToList(),
-                               user_information = {fullname = "", gsm = "", photo = ""}
+                               visitors = (db.rezervation_visitors.Where(v => v.rezervation_id == r.id)).ToList()
                            }
                            ).FirstOrDefault();
 
             // user informations validation
-            bool is_owner = user_id == rezervation.owner ? true : false;
-            if (is_owner)
-            {
-                var user = (
+            int _user_id = user_id == rezervation.owner ? rezervation.user_id: rezervation.owner;
+
+            var user = (
                     from u in db.users
-                    where u.id == rezervation.user_id
+                    where u.id == _user_id
                     join uimg in db.images on u.image_id equals uimg.id into j1
                     from j2 in j1.DefaultIfEmpty()
                     select new _RezervationUserInfo
@@ -154,12 +152,14 @@ namespace rest_api.Controllers
                         photo = j2.url
                     }).FirstOrDefault();
 
-                rezervation.user_information = user;
-
-
-            };
+            rezervation.user_information = user;
+            if(rezervation.state == false)
+            {
+                rezervation.user_information.gsm = rezervation.user_information.gsm.Substring(0, rezervation.user_information.gsm.Length - 4) + "****";
+            }
             return rezervation;
         }
+
         // Create
         [HttpPost]
         [Authorize]
