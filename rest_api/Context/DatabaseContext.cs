@@ -26,6 +26,9 @@ namespace rest_api.Context
         public DbSet<Users> users { get; set; }
         public DbSet<Suggetions> suggestions { get; set; }
         public DbSet<Notifications> notifications { get; set; }
+        public DbSet<Rezervations> rezervations { get; set; }
+        public DbSet<RezervationAdverts> rezervation_adverts { get; set; }
+        public DbSet<RezervationVisitors> rezervation_visitors { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -45,6 +48,9 @@ namespace rest_api.Context
             modelBuilder.Entity<Users>().ToTable("users");
             modelBuilder.Entity<Suggetions>().ToTable("Suggetions");
             modelBuilder.Entity<Notifications>().ToTable("Notifications");
+            modelBuilder.Entity<Rezervations>().ToTable("Rezervations");
+            modelBuilder.Entity<RezervationAdverts>().ToTable("RezervationAdverts");
+            modelBuilder.Entity<RezervationVisitors>().ToTable("RezervationVisitors");
 
 
 

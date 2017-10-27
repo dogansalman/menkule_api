@@ -8,7 +8,6 @@ namespace rest_api.Models
     {
         [Key]
         public int id { get; set; }
-        [Required]
         public int rezervation_id { get; set; }
         [Required]
         [StringLength(255)]
@@ -18,8 +17,8 @@ namespace rest_api.Models
         [Gender]
         public string gender { get; set; }
         [Required]
-        [Range(11,11)]
-        public int tc { get; set; }
+        [StringLength(11)]
+        public string tc { get; set; }
         public DateTime created_date { get; set; } = DateTime.Now;
     }
 }

@@ -223,22 +223,12 @@ namespace rest_api.Controllers
             if (advert == null) return NotFound();
             db.advert.Remove(advert);
 
-            //Possibility
-            AdvertPossibilities ap = db.advert_possibilities.FirstOrDefault(sm => sm.advert_id == id) ;
-            if (ap != null) db.advert_possibilities.Remove(ap);
-
-            //Properties
-            AdvertProperties apro = db.advert_properties.FirstOrDefault(apr => apr.advert_id == id);
-            if (apro != null) db.advert_properties.Remove(apro);
-
             //Unavaiable Dates
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(uad => uad.advert_id == id));
 
             //Avaiable Dates
             db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
 
-            //Images
-            db.advert_images.RemoveRange(db.advert_images.Where(ai => ai.advert_id == id));
             try
             {
                 db.SaveChanges();

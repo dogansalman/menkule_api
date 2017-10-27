@@ -1,20 +1,23 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace rest_api.Models
 {
     public class RezervationAdverts
     {
         [Key]
+        public int id { get; set; }
         [Required]
+        [Index("IX_RezervationAdvert", 1, IsUnique = true)]
         public int rezervation_id { get; set; }
         [Required]
         [StringLength(255)]
         public string adress { get; set; }
         [Required]
-        public float latitude { get; set; }
+        public double latitude { get; set; }
         [Required]
-        public float longitude { get; set; }
+        public double longitude { get; set; }
         [Required]
         public int cancel_time { get; set; }
         [Required]
@@ -28,6 +31,9 @@ namespace rest_api.Models
         [Required]
         public int town_id { get; set; }
         [Required]
+        public int advert_type_id { get; set; }
+        [Required]
+        [Index("IX_RezervationAdvert", 2, IsUnique = true)]
         public int advert_id { get; set; }
         [Required]
         public int user_id { get; set; }
