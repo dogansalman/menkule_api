@@ -127,10 +127,15 @@ namespace rest_api.Controllers
                                updated_date = r.updated_date,
                                rezervation_advert = new _RezervationAdvert {
                                    advert = ra,
-                                   images = (from aimg in db.advert_images where aimg.advert_id == r.advert_id join img in db.images on aimg.image_id equals img.id select new {
-                                       id = img.id,
-                                       url = img.url
-                                   }).ToList(),
+                                   images = (db.advert_images.GroupJoin(
+                                               db.images,
+                                               aimg => aimg.image_id,
+                                               i => i.id,
+                                               (ai, i) => new { advertimg = ai, image = i }
+                                               )
+                                               .Where(aimg => aimg.advertimg.advert_id == ra.advert_id)
+                                               .SelectMany(AdvertWithImage =>
+                                               AdvertWithImage.image).ToList()),
                                    advert_type = at,
                                    cities = c,
                                    possibilities = pos,
