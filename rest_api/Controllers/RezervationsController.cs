@@ -3,12 +3,12 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Security.Claims;
+using System.Collections.Generic;
 using rest_api.Libary.Responser;
 using rest_api.ModelViews;
 using rest_api.Context;
 using rest_api.Models;
-using System.Collections.Generic;
-
+using rest_api.Libary.NetGsm;
 namespace rest_api.Controllers
 {
 
@@ -183,10 +183,15 @@ namespace rest_api.Controllers
             Users user = db.users.Where(u => u.id == user_id && u.state == true).FirstOrDefault();
             if (user == null) Responser.Response(HttpStatusCode.Forbidden, "Lütfen hesabınızı doğrulayın.");
 
+
             // existence
             Advert advert = db.advert.Where(a => a.state == true && a.id == _rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
             if (db.rezervations.Any(rez => rez.user_id == user_id && rez.advert_id == _rezervation.advert_id && rez.checkin == _rezervation.checkin && rez.checkout == _rezervation.checkout)) Responser.Response(HttpStatusCode.Forbidden, "Zaten aynı tarih için bir rezervasyon talebiniz bulunmakta.");
+
+            //get owner
+            Users owner = db.users.Where(u => u.id == advert.user_id).FirstOrDefault();
+            if (owner == null) return NotFound();
 
             // available date validation
             var dateList = new List<DateTime>();
@@ -237,21 +242,25 @@ namespace rest_api.Controllers
             db.rezervation_adverts.Add(rezervation_advert);
 
             // set unavaiable date
-            dateList.ForEach(date =>
-            {
-                AdvertUnavailableDate advertUnavaiableDate = new AdvertUnavailableDate
+            //Todo Talep onaylandığında müsait olmayan tarihler işaretlenmeli.
+            /*
+                dateList.ForEach(date =>
                 {
-                    advert_id = advert.id,
-                    day = date.Day,
-                    month = date.Month,
-                    year = date.Year,
-                    fulldate = date,
-                    created_date = DateTime.Now,
-                    rezervation_id = rezervation.id
-                };
-                db.advert_unavaiable_dates.Add(advertUnavaiableDate);
-            });
-            
+                    AdvertUnavailableDate advertUnavaiableDate = new AdvertUnavailableDate
+                    {
+                        advert_id = advert.id,
+                        day = date.Day,
+                        month = date.Month,
+                        year = date.Year,
+                        fulldate = date,
+                        created_date = DateTime.Now,
+                        rezervation_id = rezervation.id
+                    };
+                    db.advert_unavaiable_dates.Add(advertUnavaiableDate);
+                });
+             */
+
+
             // create visitors
             _rezervation.visitors.ToList().ForEach(v =>
             {
@@ -267,6 +276,13 @@ namespace rest_api.Controllers
             });
 
             db.SaveChanges();
+
+            // send notifications
+            Notifications notify = new Notifications();
+            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınz için " + rezervation.days + " günlük rezervasyon talebi!");
+
+            // send sms
+            NetGsm.Send(owner.gsm, "#" + advert.id + " nolu ilaniniz icin toplam " + rezervation.days + " günlük (" + rezervation.total_price + " TL) rezervasyon talebi oluşturuldu. - Menkule.com.tr");
 
             return Ok();
   
