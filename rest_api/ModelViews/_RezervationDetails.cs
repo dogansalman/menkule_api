@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using rest_api.Models;
 
 namespace rest_api.ModelViews
@@ -18,6 +16,7 @@ namespace rest_api.ModelViews
     }
     public class _RezervationUserInfo
     {
+        public int id { get; set; }
         public string fullname { get; set; }
         public string gsm { get; set; }
         public string photo { get; set; }
@@ -28,7 +27,7 @@ namespace rest_api.ModelViews
         public int id { get; set; }
         public string note { get; set; }
         public int user_id { get; set; }
-        public int owner { get; set; }
+        public bool advert_owner { get; set; }
         public int visitor { get; set; }
         public int advert_id { get; set; }
         public int days { get; set; }

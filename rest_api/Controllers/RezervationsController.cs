@@ -117,7 +117,6 @@ namespace rest_api.Controllers
                                day_price = r.day_price,
                                total_price = r.total_price,
                                user_id = r.user_id,
-                               owner = r.owner,
                                visitor = r.visitor,
                                description_state = r.description_state,
                                note = r.note,
@@ -147,8 +146,8 @@ namespace rest_api.Controllers
                            ).FirstOrDefault();
 
             // user informations validation
-            int _user_id = user_id == rezervation.owner ? rezervation.user_id: rezervation.owner;
-
+            int _user_id = user_id == rezervation.rezervation_advert.advert.user_id ? rezervation.user_id: rezervation.rezervation_advert.advert.user_id;
+            rezervation.advert_owner = rezervation.rezervation_advert.advert.user_id == user_id ? true : false;
             var user = (
                     from u in db.users
                     where u.id == _user_id
@@ -156,6 +155,7 @@ namespace rest_api.Controllers
                     from j2 in j1.DefaultIfEmpty()
                     select new _RezervationUserInfo
                     {
+                        id = u.id,
                         fullname = u.name + " " + u.lastname,
                         gsm = u.gsm,
                         photo = j2.url
@@ -241,26 +241,6 @@ namespace rest_api.Controllers
             };
             db.rezervation_adverts.Add(rezervation_advert);
 
-            // set unavaiable date
-            //Todo Talep onaylandığında müsait olmayan tarihler işaretlenmeli.
-            /*
-                dateList.ForEach(date =>
-                {
-                    AdvertUnavailableDate advertUnavaiableDate = new AdvertUnavailableDate
-                    {
-                        advert_id = advert.id,
-                        day = date.Day,
-                        month = date.Month,
-                        year = date.Year,
-                        fulldate = date,
-                        created_date = DateTime.Now,
-                        rezervation_id = rezervation.id
-                    };
-                    db.advert_unavaiable_dates.Add(advertUnavaiableDate);
-                });
-             */
-
-
             // create visitors
             _rezervation.visitors.ToList().ForEach(v =>
             {
@@ -286,6 +266,78 @@ namespace rest_api.Controllers
 
             return Ok();
   
+        }
+
+        //Approved
+        [HttpGet]
+        [Authorize(Roles = "owner")]
+        [Route("approve/{id}")]
+        public IHttpActionResult approve(int id)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            Rezervations rezervation = db.rezervations.Find(id);
+            if (rezervation == null) return NotFound();
+            if(rezervation.updated_date != null) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
+            RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
+            if (advert == null) return NotFound();
+            if (advert.user_id != user_id) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
+
+            
+            rezervation.state = true;
+            rezervation.is_cancel = false;
+            rezervation.updated_date = DateTime.Now;
+
+            // available date validation
+            var dateList = new List<DateTime>();
+            for (DateTime date = rezervation.checkin; date.Date <= rezervation.checkout.Date; date = date.AddDays(1))
+            {
+                dateList.Add(date);
+            }
+
+            // set unavaiable date
+                dateList.ForEach(date =>
+                {
+                    AdvertUnavailableDate advertUnavaiableDate = new AdvertUnavailableDate
+                    {
+                        advert_id = rezervation.advert_id,
+                        day = date.Day,
+                        month = date.Month,
+                        year = date.Year,
+                        fulldate = date,
+                        created_date = DateTime.Now,
+                        rezervation_id = rezervation.id
+                    };
+                    db.advert_unavaiable_dates.Add(advertUnavaiableDate);
+                });
+
+            db.SaveChanges();
+
+            return Ok();
+        }
+        //Cancel
+        [HttpGet]
+        [Authorize(Roles = "owner")]
+        [Route("cancel/{id}")]
+        public IHttpActionResult cancel(int id)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            Rezervations rezervation = db.rezervations.Find(id);
+            if (rezervation == null) return NotFound();
+            RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
+            if (advert == null) return NotFound();
+            if (advert.user_id != user_id) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
+
+            rezervation.state = false;
+            rezervation.is_cancel = true;
+            rezervation.updated_date = DateTime.Now;
+
+            db.SaveChanges();
+
+            return Ok();
         }
 
     }
