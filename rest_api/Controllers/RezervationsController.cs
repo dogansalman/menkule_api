@@ -284,6 +284,8 @@ namespace rest_api.Controllers
             if (advert == null) return NotFound();
             if (advert.user_id != user_id) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
 
+            Users user = db.users.Find(rezervation.user_id);
+            if (user == null) return NotFound();
             
             rezervation.state = true;
             rezervation.is_cancel = false;
@@ -312,7 +314,12 @@ namespace rest_api.Controllers
                     db.advert_unavaiable_dates.Add(advertUnavaiableDate);
                 });
 
+         
             db.SaveChanges();
+
+            //Send sms
+            NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz onaylandı. - Menkule.com.tr");
+
 
             return Ok();
         }
@@ -331,11 +338,17 @@ namespace rest_api.Controllers
             if (advert == null) return NotFound();
             if (advert.user_id != user_id) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
 
+            Users user = db.users.Find(rezervation.user_id);
+            if (user == null) return NotFound();
+
             rezervation.state = false;
             rezervation.is_cancel = true;
             rezervation.updated_date = DateTime.Now;
 
             db.SaveChanges();
+
+            //Send sms
+            NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz iptal edildi. - Menkule.com.tr");
 
             return Ok();
         }

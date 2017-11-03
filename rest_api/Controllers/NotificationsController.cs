@@ -21,7 +21,16 @@ namespace rest_api.Controllers
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-            return db.notifications.Where(n => n.user_id == user_id).OrderByDescending(n => n.created_date).ToList();
+
+            List<Notifications> notifiys =  db.notifications.Where(n => n.user_id == user_id).OrderByDescending(n => n.created_date).ToList();
+
+            using (var dbcon = new DatabaseContext())
+            {
+                dbcon.notifications.Where(n => n.user_id == user_id).ToList().ForEach(n => { n.state = false; n.updated_date = DateTime.Now; });
+                dbcon.SaveChanges();
+            }
+          
+            return notifiys;
         }
 
         // Delete
@@ -54,7 +63,7 @@ namespace rest_api.Controllers
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-            return db.notifications.Where(n => n.user_id == user_id && n.state == false).OrderByDescending(n => n.created_date).Take(count).ToList();
+            return db.notifications.Where(n => n.user_id == user_id && n.state == true).OrderByDescending(n => n.created_date).Take(count).ToList();
         }
 
     }
