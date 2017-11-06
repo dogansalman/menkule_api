@@ -43,6 +43,7 @@ namespace rest_api.ModelViews
         public _RezervationAdvert rezervation_advert { get; set; }
         public List<RezervationVisitors> visitors { get; set; }
         public _RezervationUserInfo user_information { get; set; }
+        public bool is_cancelable { get; set; }
        
 
     }

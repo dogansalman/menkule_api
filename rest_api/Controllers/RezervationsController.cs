@@ -166,6 +166,15 @@ namespace rest_api.Controllers
             {
                 rezervation.user_information.gsm = rezervation.user_information.gsm.Substring(0, rezervation.user_information.gsm.Length - 4) + "****";
             }
+
+            // rezervation is cancalable
+            if(!rezervation.advert_owner)
+            {
+                DateTime lastCanceleableDate = rezervation.checkin.AddDays(-rezervation.rezervation_advert.advert.cancel_time);
+                DateTime EndDate = DateTime.Now;
+                int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
+                rezervation.is_cancelable = dateDiff < 0 || rezervation.is_cancel ? false : true;
+            }
             return rezervation;
         }
 

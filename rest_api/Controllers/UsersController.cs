@@ -131,7 +131,7 @@ namespace rest_api.Controllers
                      ).Count(),
                      notification_size = (
                      from ntf in db.notifications
-                     where ntf.user_id == u.user.id && ntf.state == false
+                     where ntf.user_id == u.user.id && ntf.state == true
                      select (ntf)
                      ).Count(),
                      state = u.user.state,
