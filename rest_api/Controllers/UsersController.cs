@@ -17,7 +17,7 @@ using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
-
+using System.Net.Http;
 
 namespace rest_api.Controllers
 {
@@ -302,9 +302,11 @@ namespace rest_api.Controllers
         }
 
         [HttpGet]
-        [Route("password/token/{token}")]
-        public IHttpActionResult checktoken(string token)
+        [Route("password/validate")]
+        public IHttpActionResult checktoken()
         {
+            var allUrlKeyValues = ControllerContext.Request.GetQueryNameValuePairs();
+            string token = allUrlKeyValues.LastOrDefault(x => x.Key == "token").Value;
             Users user = db.users.Where(u => u.password_token == token).FirstOrDefault();
             if (user == null) return NotFound();
 
