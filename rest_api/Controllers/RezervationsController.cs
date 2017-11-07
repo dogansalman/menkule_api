@@ -173,7 +173,7 @@ namespace rest_api.Controllers
                 DateTime lastCanceleableDate = rezervation.checkin.AddDays(-rezervation.rezervation_advert.advert.cancel_time);
                 DateTime EndDate = DateTime.Now;
                 int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
-                rezervation.is_cancelable = dateDiff < 0 || rezervation.is_cancel ? false : true;
+                rezervation.is_cancelable = dateDiff <= 0 || rezervation.is_cancel ? false : true;
             }
             return rezervation;
         }
@@ -332,10 +332,11 @@ namespace rest_api.Controllers
 
             return Ok();
         }
+        
         //Cancel
         [HttpGet]
-        [Authorize(Roles = "owner")]
         [Route("cancel/{id}")]
+        [Authorize]
         public IHttpActionResult cancel(int id)
         {
             var claimsIdentity = User.Identity as ClaimsIdentity;
@@ -343,21 +344,34 @@ namespace rest_api.Controllers
 
             Rezervations rezervation = db.rezervations.Find(id);
             if (rezervation == null) return NotFound();
+            if (rezervation.is_cancel) Responser.Response(HttpStatusCode.Forbidden, "Rezervasyon daha önce iptal edilmiş!");
+
             RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
-            if (advert.user_id != user_id) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
 
-            Users user = db.users.Find(rezervation.user_id);
-            if (user == null) return NotFound();
+            bool is_cancel = rezervation.is_cancel;
 
             rezervation.state = false;
             rezervation.is_cancel = true;
             rezervation.updated_date = DateTime.Now;
 
-            db.SaveChanges();
+            
+            if (advert.user_id == user_id) {
+                Users user = db.users.Find(rezervation.user_id);
+                if (user == null) return NotFound();
+                db.SaveChanges();
 
-            //Send sms
-            NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz iptal edildi. - Menkule.com.tr");
+                //Send sms
+                NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz iptal edildi. - Menkule.com.tr");
+            }
+            if(user_id == rezervation.user_id)
+            {
+                DateTime lastCanceleableDate = rezervation.checkin.AddDays(-advert.cancel_time);
+                DateTime EndDate = DateTime.Now;
+                int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
+                if (!(dateDiff <= 0 || is_cancel ? false : true)) Responser.Response(HttpStatusCode.Forbidden, "Bu rezervasyon iptal süresi dışındadır!");
+                db.SaveChanges();
+            }
 
             return Ok();
         }
