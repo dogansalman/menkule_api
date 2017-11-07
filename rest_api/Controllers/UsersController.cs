@@ -289,6 +289,8 @@ namespace rest_api.Controllers
             try
             {
                 user.password = Bcrypt.hash(_token.password);
+                user.forgot_last_date = null;
+                user.password_token = null;
                 db.SaveChanges();
             }
             catch (Exception ex)
@@ -298,6 +300,23 @@ namespace rest_api.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        [Route("password/token/{token}")]
+        public IHttpActionResult checktoken(string token)
+        {
+            Users user = db.users.Where(u => u.password_token == token).FirstOrDefault();
+            if (user == null) return NotFound();
+
+            if (user.forgot_last_date != null)
+            {
+                TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.forgot_last_date);
+                if (diff.TotalHours >= 2) return NotFound();
+            }
+
+            return Ok();
+        }
+
 
         /*
          User Gsm Email Validations Function
