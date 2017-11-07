@@ -9,6 +9,8 @@ using rest_api.ModelViews;
 using rest_api.Context;
 using rest_api.Models;
 using rest_api.Libary.NetGsm;
+using rest_api.Libary.Mailgun;
+
 namespace rest_api.Controllers
 {
 
@@ -273,8 +275,13 @@ namespace rest_api.Controllers
             // send sms
             NetGsm.Send(owner.gsm, "#" + advert.id + " nolu ilaniniz icin toplam " + rezervation.days + " günlük (" + rezervation.total_price + " TL) rezervasyon talebi oluşturuldu. - Menkule.com.tr");
 
+            //send mail
+            Mailgun.Send("rezervation", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.lastname) }, { "advert_id", advert.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days}, {"price", rezervation.total_price + " TL." } }, owner.email, "Yeni rezervasyon talebi");
+
             return Ok();
-  
+
+            
+
         }
 
         //Approved

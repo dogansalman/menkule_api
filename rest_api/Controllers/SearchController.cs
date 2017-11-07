@@ -53,7 +53,17 @@ namespace rest_api.Controllers
                         possibility = po,
                         properties = p,
                         advert_type = at,
-                        available_date = (db.advert_avaiable_dates.Where(ad => ad.advert_id == a.id)).ToList(),
+                        available_date = (
+                            from ad in db.advert_avaiable_dates
+                            where ad.advert_id == a.id
+                            group ad by ad.uniq into g
+                            select new
+                            {
+                                from_date = g.Min(e => e.fulldate),
+                                to_date = g.Max(e => e.fulldate),
+                                uniq = g.Select(a => a.uniq).FirstOrDefault()
+                            }
+                            ).ToList(),
                         unavaiable_date = (db.advert_unavaiable_dates.Where(aud => aud.advert_id == a.id)).ToList(),
                         state = a.state,
                         created_date = a.created_date,
