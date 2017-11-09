@@ -387,7 +387,7 @@ namespace rest_api.Controllers
             }
 
             //Send Gsm Activation Code
-            //NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
+            NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
 
             return Ok();
         }
