@@ -8,6 +8,10 @@ using System.Web.Http.Description;
 using System.Web.UI.WebControls;
 using System.Web.Helpers;
 using System.Collections.Generic;
+using Microsoft.Owin.Security;
+using rest_api.OAuth.Provider;
+using Microsoft.Owin.Security.OAuth;
+using System.Net.Http;
 using rest_api.Models;
 using rest_api.Context;
 using rest_api.ModelViews;
@@ -17,7 +21,7 @@ using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
-using System.Net.Http;
+
 
 namespace rest_api.Controllers
 {
@@ -26,7 +30,6 @@ namespace rest_api.Controllers
     public class UsersController : ApiController
     {
         DatabaseContext db = new DatabaseContext();
-
         /*
          User create read update functions
              */
@@ -170,7 +173,7 @@ namespace rest_api.Controllers
                 dbUser.gsm_activation_code = gsm_code;
 
                 //send gsm activation code
-                NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
+                NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + gsm_code);
             }
 
             dbUser.gsm = user.gsm;
@@ -365,7 +368,7 @@ namespace rest_api.Controllers
             if (user.gsm_last_update != null)
             {
                 TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.gsm_last_update);
-                if (diff.TotalHours >= 1) return BadRequest();
+                if (diff.TotalMinutes <= 4) Responser.Response(HttpStatusCode.Forbidden, "Yeni aktivasyon kodu için 4 dakika beklemeniz gerekmektedir.");
             }
 
             //generate activation code
@@ -384,7 +387,7 @@ namespace rest_api.Controllers
             }
 
             //Send Gsm Activation Code
-            NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
+            //NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
 
             return Ok();
         }
@@ -413,6 +416,21 @@ namespace rest_api.Controllers
             {
                 ExceptionHandler.Handle(e);
             }
+
+            /*
+                //claimsIdentity.RemoveClaim(new Claim(ClaimTypes.Role, "owner"));
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "owner"));
+                Microsoft.Owin.IOwinContext context = HttpContext.Current.GetOwinContext();
+                context.Authentication.SignOut();
+                context.Authentication.SignIn(claimsIdentity);
+                //var authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
+                //authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties() { IsPersistent = true });
+                 var roles = ((ClaimsIdentity)User.Identity).Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value);
+             */
+
+
             return Ok();
         }
 

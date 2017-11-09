@@ -17,7 +17,7 @@ namespace rest_api.OAuth.Provider
         }
 
         DatabaseContext db = new DatabaseContext();
-
+ 
         // OAuthAuthorizationServerProvider sınıfının kaynak erişimine izin verebilmek için ilgili GrantResourceOwnerCredentials metotunu override ediyoruz.
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {

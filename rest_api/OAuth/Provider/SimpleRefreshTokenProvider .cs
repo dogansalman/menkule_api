@@ -13,7 +13,7 @@ namespace rest_api.OAuth.Provider
             Create(context);
         }
         public void Create(AuthenticationTokenCreateContext context)
-        {
+        {   
             object owinCollection;
             context.OwinContext.Environment.TryGetValue("Microsoft.Owin.Form#collection", out owinCollection);
 
@@ -22,7 +22,7 @@ namespace rest_api.OAuth.Provider
             if (grantType == null || grantType.Equals("refresh_token")) return;
 
             //Dilerseniz access_token'dan farklı olarak refresh_token'ın expire time'ını da belirleyebilir, uzatabilirsiniz 
-            context.Ticket.Properties.ExpiresUtc = DateTime.UtcNow.AddMinutes(180);
+            context.Ticket.Properties.ExpiresUtc = DateTime.UtcNow.AddDays(7);
 
             context.SetToken(context.SerializeTicket());
         }

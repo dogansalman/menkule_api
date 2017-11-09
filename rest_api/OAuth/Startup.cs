@@ -17,8 +17,9 @@ namespace rest_api.OAuth
             HttpConfiguration httpConfiguration = new HttpConfiguration();
             ConfigureOAuth(appBuilder);
             WebApiConfig.Register(httpConfiguration);
-            appBuilder.UseWebApi(httpConfiguration);
             appBuilder.UseCors(CorsOptions.AllowAll);
+            appBuilder.UseWebApi(httpConfiguration);
+            
 
         }
 
