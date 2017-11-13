@@ -28,7 +28,7 @@ namespace rest_api.OAuth
             OAuthAuthorizationServerOptions oAuthAuthorizationServerOptions = new OAuthAuthorizationServerOptions()
             {
                 TokenEndpointPath = new PathString("/auth/login"), // token alacağımız path'i belirtiyoruz
-                AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
+                AccessTokenExpireTimeSpan = TimeSpan.FromHours(12),
                 AllowInsecureHttp = true,
                 Provider = new AuthorizationServerProvider(),
                 RefreshTokenProvider = new SimpleRefreshTokenProvider()

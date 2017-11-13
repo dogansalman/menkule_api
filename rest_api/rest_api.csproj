@@ -250,6 +250,7 @@
     <Compile Include="OAuth\Provider\SimpleRefreshTokenProvider .cs" />
     <Compile Include="OAuth\Startup.cs" />
     <Compile Include="OAuth\Provider\AuthorizationServerProvider.cs" />
+    <Compile Include="OAuth\AuthorizeAttr\AuthorizeAttr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

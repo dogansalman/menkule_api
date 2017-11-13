@@ -8,9 +8,6 @@ using System.Web.Http.Description;
 using System.Web.UI.WebControls;
 using System.Web.Helpers;
 using System.Collections.Generic;
-using Microsoft.Owin.Security;
-using rest_api.OAuth.Provider;
-using Microsoft.Owin.Security.OAuth;
 using System.Net.Http;
 using rest_api.Models;
 using rest_api.Context;
@@ -21,7 +18,6 @@ using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
-
 
 namespace rest_api.Controllers
 {
@@ -102,8 +98,8 @@ namespace rest_api.Controllers
 
         // Get
         [HttpGet]
-        [Authorize]
         [Route("")]
+        [Authorize]
         public IHttpActionResult get()
         {
 
