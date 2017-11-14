@@ -11,17 +11,6 @@ namespace rest_api.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-
-            //Set index key 
-            /*
-             * modelBuilder.Entity<ModelName>()
-                .HasKey(pp => new { pp.personel_id, pp.production_id });
-             */
-
-            //modelBuilder.Entity<Users>()
-            //    .HasKey(u => new {u.email, u.gsm });
-
-
         }
 
         //Migrations
@@ -45,6 +34,9 @@ namespace rest_api.Models
         public DbSet<Suggetions> Suggetions { get; set; }
         public DbSet<Towns> Towns { get; set; }
         public DbSet<Users> Users { get; set; }
+        public DbSet<UserMessages> UserMessages { get; set;}
+        public DbSet<Messages> Messages { get; set; }
+
 
     }
 }

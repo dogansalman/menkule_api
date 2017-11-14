@@ -29,6 +29,9 @@ namespace rest_api.Context
         public DbSet<Rezervations> rezervations { get; set; }
         public DbSet<RezervationAdverts> rezervation_adverts { get; set; }
         public DbSet<RezervationVisitors> rezervation_visitors { get; set; }
+        public DbSet<UserMessages> user_messages { get; set; }
+        public DbSet<Messages> messages { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -51,6 +54,8 @@ namespace rest_api.Context
             modelBuilder.Entity<Rezervations>().ToTable("Rezervations");
             modelBuilder.Entity<RezervationAdverts>().ToTable("RezervationAdverts");
             modelBuilder.Entity<RezervationVisitors>().ToTable("RezervationVisitors");
+            modelBuilder.Entity<UserMessages>().ToTable("UserMessages");
+            modelBuilder.Entity<Messages>().ToTable("Messages");
 
 
 
