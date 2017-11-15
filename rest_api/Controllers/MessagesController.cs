@@ -7,9 +7,15 @@ using System.Web.Script.Serialization;
 using rest_api.ModelViews;
 using rest_api.Context;
 using rest_api.Models;
+using Newtonsoft.Json;
 
 namespace rest_api.Controllers
 {
+    public class Item
+    {
+        public string Html { get; set; }
+    }
+
     [RoutePrefix("message")]
     public class MessagesController : ApiController
     {
@@ -78,15 +84,16 @@ namespace rest_api.Controllers
         {
             var identity = User.Identity as ClaimsIdentity;
             int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
-
+            
             return (
                 from m in db.messages
                 join um in db.user_messages on m.id equals um.message_id
                 where um.user_id == user_id && um.is_deleted == false
-                select new
+                select new _Messages()
                 {
                     message = m.last_message,
-                    last_view = um.last_view
+                    last_view = um.last_view,
+                    user = (um.user_id != user_id ? (from u in db.users where u.id == user_id join uimg in db.images on u.image_id equals uimg.id into j1 from j2 in j1.DefaultIfEmpty() select new _MessageUser() { fullname = u.name + " " + u.lastname, photo = j2.url }).FirstOrDefault() : (from mm in db.user_messages where mm.id == m.id join u in db.users on mm.user_id equals u.id join uimg in db.images on u.image_id equals uimg.id into j1 from j2 in j1.DefaultIfEmpty() select new _MessageUser() { fullname = u.name + " " + u.lastname, photo = j2.url }).FirstOrDefault())
                 }
                 ).ToList();
         }
