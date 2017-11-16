@@ -15,8 +15,20 @@ namespace rest_api.ModelViews
 
     public class _MessageDetailList
     {
-        public ICollection<_MessageDetail> messages { get; set; }
-        public int user_id { get; set; }
+        public int id { get; set; }
+        private object _message;
+        public object message
+        {
+            get
+            {
+                return JsonConvert.DeserializeObject<ICollection<_MessageDetail>>(_message.ToString());
+            }
+            set { _message = value; }
+
+        }
+        public DateTime? last_view { get; set; }
+        public _MessageUser user { get; set; }
+
     }
     public class _Message
     {
@@ -27,8 +39,16 @@ namespace rest_api.ModelViews
         public int user_id { get; set; }
     }
 
+    public class _ReplyMessage
+    {
+        [Required]
+        [StringLength(300)]
+        public string message { get; set; }
+    }
+
     public class _Messages
     {
+        public int id { get; set; }
         private object _message;
 
         public object message
