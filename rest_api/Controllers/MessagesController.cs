@@ -123,7 +123,7 @@ namespace rest_api.Controllers
                    last_view = um.last_view,
                    user = (from mm in db.user_messages where mm.message_id == m.id && mm.user_id != user_id join u in db.users on mm.user_id equals u.id join uimg in db.images on u.image_id equals uimg.id into j1 from j2 in j1.DefaultIfEmpty() select new _MessageUser() { fullname = u.name + " " + u.lastname, photo = j2.url }).FirstOrDefault()
                }
-               ).ToList();
+               ).FirstOrDefault();
 
             userMessage.last_view = DateTime.Now;
             db.SaveChanges();
@@ -169,7 +169,7 @@ namespace rest_api.Controllers
             userMessageRecipient.last_view = null;
             db.SaveChanges();
 
-            return Ok(messages);
+            return Ok(reply);
         }
     }
 }
