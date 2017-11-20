@@ -1,13 +1,24 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using rest_api.Filters;
+using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
+using rest_api.Filters;
+using rest_api.Context;
+
 
 namespace rest_api.Models
 {
     public class Users
     {
         
+        public object getPhotosUrl()
+        {
+            using (var db = new DatabaseContext())
+            {
+                return db.images.Where(img => img.id == this.image_id).FirstOrDefault()?.url;
+            }
+        }
+
         [Key]
         public int id { get; set; }
         private string _name;

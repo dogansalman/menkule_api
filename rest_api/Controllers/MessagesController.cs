@@ -9,6 +9,7 @@ using rest_api.ModelViews;
 using rest_api.Context;
 using rest_api.Models;
 using rest_api.Libary.Responser;
+using rest_api.Libary.Socket;
 
 namespace rest_api.Controllers
 {
@@ -76,9 +77,10 @@ namespace rest_api.Controllers
             db.user_messages.Add(userMessage_Recipient);
             db.SaveChanges();
 
+            Socket.Emit(_message.user_id, "message", new { id = message.id, message = msgDetail, last_view = DBNull.Value, user = new { fullname = user.name + " " + user.lastname, photo = user?.getPhotosUrl() } });
+
             return Ok(message);
         }
-
 
         [HttpGet]
         [Authorize]
@@ -169,7 +171,32 @@ namespace rest_api.Controllers
             userMessageRecipient.last_view = null;
             db.SaveChanges();
 
+            Socket.Emit(userMessageRecipient.user_id, "message", new { id = id, message = reply, last_view = DBNull.Value, user = new { fullname = user.name + " " + user.lastname, photo = user?.getPhotosUrl()  } });
+
             return Ok(reply);
+        }
+
+
+        // New Last 10 Gets
+        [HttpGet]
+        [Route("last/{count}")]
+        [Authorize]
+        public object getLast(int count)
+        {
+            var identity = User.Identity as ClaimsIdentity;
+            int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
+            return (
+                from m in db.messages
+                join um in db.user_messages on m.id equals um.message_id
+                where um.user_id == user_id && um.is_deleted == false && um.last_view == null
+                select new _Messages()
+                {
+                    id = m.id,
+                    message = m.last_message,
+                    last_view = um.last_view,
+                    user = (from mm in db.user_messages where mm.message_id == m.id && mm.user_id != user_id join u in db.users on mm.user_id equals u.id join uimg in db.images on u.image_id equals uimg.id into j1 from j2 in j1.DefaultIfEmpty() select new _MessageUser() { fullname = u.name + " " + u.lastname, photo = j2.url }).FirstOrDefault()
+                }
+                ).ToList();
         }
     }
 }
