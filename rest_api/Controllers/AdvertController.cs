@@ -11,6 +11,7 @@ using rest_api.Context;
 using rest_api.Models;
 using rest_api.Libary.Exceptions;
 using rest_api.Libary.Cloudinary;
+using rest_api.OAuth.CustomAttributes.Owner;
 
 namespace rest_api.Controllers
 {
@@ -19,7 +20,8 @@ namespace rest_api.Controllers
     {
         //Get
         DatabaseContext db = new DatabaseContext();
-        [Authorize(Roles = "owner")]
+        [Authorize]
+        [Owner]
         [HttpGet]
         [Route("")]
         public object get()
