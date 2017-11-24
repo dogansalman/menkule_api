@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace rest_api.OAuth.Provider
 {
-    public class SimpleRefreshTokenProvider: IAuthenticationTokenProvider
+    public class RefreshTokenProvider: IAuthenticationTokenProvider
     {
         public async Task CreateAsync(AuthenticationTokenCreateContext context)
         {
@@ -21,9 +21,8 @@ namespace rest_api.OAuth.Provider
 
             if (grantType == null || grantType.Equals("refresh_token")) return;
 
-            //Dilerseniz access_token'dan farklı olarak refresh_token'ın expire time'ını da belirleyebilir, uzatabilirsiniz 
-            context.Ticket.Properties.ExpiresUtc = DateTime.UtcNow.AddDays(7);
-
+            context.Ticket.Properties.ExpiresUtc = DateTime.UtcNow.AddDays(2);
+           
             context.SetToken(context.SerializeTicket());
         }
 

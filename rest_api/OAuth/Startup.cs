@@ -19,19 +19,17 @@ namespace rest_api.OAuth
             WebApiConfig.Register(httpConfiguration);
             appBuilder.UseCors(CorsOptions.AllowAll);
             appBuilder.UseWebApi(httpConfiguration);
-            
-
         }
 
         private void ConfigureOAuth(IAppBuilder appBuilder)
         {
             OAuthAuthorizationServerOptions oAuthAuthorizationServerOptions = new OAuthAuthorizationServerOptions()
             {
-                TokenEndpointPath = new PathString("/auth/login"), // token alacağımız path'i belirtiyoruz
+                TokenEndpointPath = new PathString("/auth"), // token alacağımız path'i belirtiyoruz
                 AccessTokenExpireTimeSpan = TimeSpan.FromHours(12),
                 AllowInsecureHttp = true,
                 Provider = new AuthorizationServerProvider(),
-                RefreshTokenProvider = new SimpleRefreshTokenProvider()
+                RefreshTokenProvider = new RefreshTokenProvider()
             };
 
             // AppBuilder'a token üretimini gerçekleştirebilmek için ilgili authorization ayarlarımızı veriyoruz.

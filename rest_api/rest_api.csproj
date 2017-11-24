@@ -251,7 +251,7 @@
     <Compile Include="ModelViews\_Code.cs" />
     <Compile Include="ModelViews\_Mail.cs" />
     <Compile Include="ModelViews\_UserPassword.cs" />
-    <Compile Include="OAuth\Provider\SimpleRefreshTokenProvider .cs" />
+    <Compile Include="OAuth\Provider\RefreshTokenProvider .cs" />
     <Compile Include="OAuth\Startup.cs" />
     <Compile Include="OAuth\Provider\AuthorizationServerProvider.cs" />
     <Compile Include="OAuth\AuthorizeAttr\AuthorizeAttr.cs" />

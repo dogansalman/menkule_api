@@ -5,6 +5,8 @@ using rest_api.Context;
 using rest_api.Models;
 using System.Linq;
 using rest_api.Libary.Bcrypt;
+using Microsoft.Owin;
+using System;
 
 namespace rest_api.OAuth.Provider
 {
@@ -21,8 +23,6 @@ namespace rest_api.OAuth.Provider
         // OAuthAuthorizationServerProvider sınıfının kaynak erişimine izin verebilmek için ilgili GrantResourceOwnerCredentials metotunu override ediyoruz.
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            // CORS ayarlarını set ediyoruz.
-            context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
 
             // Kullanıcının access_token alabilmesi için gerekli validation işlemlerini yapıyoruz.
             string pass = Bcrypt.hash(context.Password);
@@ -40,6 +40,42 @@ namespace rest_api.OAuth.Provider
             {
                 context.SetError("invalid_grant", "Kullanıcı adı veya şifre yanlış.");
             }
+        }
+
+
+        public override Task MatchEndpoint(OAuthMatchEndpointContext context)
+        {
+            SetCORSPolicy(context.OwinContext);
+            if (context.Request.Method == "OPTIONS")
+            {
+                
+                context.RequestCompleted();
+                return Task.FromResult(0);
+            }
+            return base.MatchEndpoint(context);
+        }
+
+        private void SetCORSPolicy(IOwinContext context)
+        {
+            string allowedUrls = "http://localhost:9000, http://www.menkule.com.tr, https://www.menkule.com.tr";
+
+            if (!String.IsNullOrWhiteSpace(allowedUrls))
+            {
+                var list = allowedUrls.Split(',');
+                if (list.Length > 0)
+                {
+                    string origin = context.Request.Headers.Get("Origin");
+                    var found = list.Where(item => item == origin).Any();
+                    //Allow All for hybrid app
+                    context.Response.Headers.Add("Access-Control-Allow-Origin", new string[] { "*" });
+                    //if (found) context.Response.Headers.Add("Access-Control-Allow-Origin",new string[] { found });
+                }
+            }
+            context.Response.Headers.Add("Access-Control-Allow-Headers",
+                                   new string[] { "Authorization", "Content-Type" });
+            context.Response.Headers.Add("Access-Control-Allow-Methods",
+                                   new string[] { "OPTIONS", "POST", "PUT", "DELETE", "GET" });
+
         }
     }
 }
