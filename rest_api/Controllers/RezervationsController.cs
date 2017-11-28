@@ -103,6 +103,7 @@ namespace rest_api.Controllers
             var rezervation = (
                            from r in db.rezervations
                            where r.owner == user_id || r.user_id == user_id
+                           where r.id == id
                            join ra in db.rezervation_adverts on r.id equals ra.rezervation_id
                            join c in db.cities on ra.city_id equals c.id
                            join t in db.towns on ra.town_id equals t.id
