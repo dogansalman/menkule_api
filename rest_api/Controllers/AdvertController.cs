@@ -79,8 +79,7 @@ namespace rest_api.Controllers
                     join pos in db.advert_possibilities on a.id equals pos.advert_id
                     select new
                     {
-                        advert = new
-                        {
+                        
                             id = a.id,
                             adress = a.adress,
                             user_id = a.user_id,
@@ -99,7 +98,7 @@ namespace rest_api.Controllers
                             title = a.title,
                             created_date = a.created_date,
                             updated_date = a.updated_date
-                        },
+                        ,
                         possibilities = pos,
                         properties = p,
                         city = (db.cities.Where(c => c.id == a.city_id)).FirstOrDefault(),
@@ -370,21 +369,30 @@ namespace rest_api.Controllers
         [ResponseType(typeof(FileUpload))]
         public IHttpActionResult upload()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-            Users user = db.users.Find(user_id);
+            try
+            {
+                var claimsIdentity = User.Identity as ClaimsIdentity;
+                int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+                Users user = db.users.Find(user_id);
 
-            var httpRequest = HttpContext.Current.Request;
-            List<string> imageExt = new List<string> { { "jpg" }, { "png" }, { "jpeg" } };
-            var image = new WebImage(httpRequest.InputStream);
-            if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
+                var httpRequest = HttpContext.Current.Request;
+                List<string> imageExt = new List<string> { { "jpg" }, { "png" }, { "jpeg" } };
+                var image = new WebImage(httpRequest.InputStream);
+                if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
 
-            image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
+                image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
 
-            Images advertImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
-            if (advertImage == null) return BadRequest();
-            
-            return Ok(advertImage);
+                Images advertImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
+                if (advertImage == null) return BadRequest();
+
+                return Ok(advertImage);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message.ToString());
+            }
+          
         }
 
         //Search Find
