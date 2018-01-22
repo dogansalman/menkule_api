@@ -201,6 +201,7 @@
     <Compile Include="Controllers\SuggestionsController.cs" />
     <Compile Include="Controllers\UnavailableDateController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
+    <Compile Include="Controllers\LetsencryptController.cs" />
     <Compile Include="Filters\Gender.cs" />
     <Compile Include="Filters\IpAdress.cs" />
     <Compile Include="Filters\Phone.cs" />
