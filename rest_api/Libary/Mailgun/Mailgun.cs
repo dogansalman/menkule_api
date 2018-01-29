@@ -38,7 +38,7 @@ namespace rest_api.Libary.Mailgun
 
         private static string RenderTemplate(string templateName)
         {
-            string templatesrc = HttpContext.Current.Server.MapPath("~/Libary/Mailgun/templates/" + templateName + ".html");
+            string templatesrc = HttpContext.Current.Server.MapPath("~/App_Data/email/" + templateName + ".html");
             string templateString = "";
             using (StreamReader reader = new StreamReader(templatesrc, true))
             {

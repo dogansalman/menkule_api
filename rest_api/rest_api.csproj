@@ -173,9 +173,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\email\rezervation.html" />
     <Content Include="Global.asax" />
-    <Content Include="Libary\Mailgun\templates\forgot_password.html" />
-    <Content Include="Libary\Mailgun\templates\register.html" />
+    <Content Include="App_Data\email\forgot_password.html" />
+    <Content Include="App_Data\email\register.html" />
     <Content Include="LICENSE.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -275,9 +276,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>

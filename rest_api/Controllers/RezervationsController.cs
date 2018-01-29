@@ -187,6 +187,7 @@ namespace rest_api.Controllers
         [Route("")]
         public IHttpActionResult add([FromBody] _Rezervation _rezervation)
         {
+
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             // get user
@@ -207,10 +208,11 @@ namespace rest_api.Controllers
 
             // available date validation
             var dateList = new List<DateTime>();
-            for (DateTime date = _rezervation.checkin; date.Date <= _rezervation.checkout.Date; date = date.AddDays(1)) {
+            for (DateTime date = _rezervation.checkin; date.Date <= _rezervation.checkout.Date; date = date.AddDays(1))
+            {
                 dateList.Add(date);
             }
-            if(db.advert_unavaiable_dates.Where(i => dateList.Contains(i.fulldate)).Count() > 0) Responser.Response(HttpStatusCode.Forbidden, "İlan belirtilen tarih için müsait değil.");
+            if (db.advert_unavaiable_dates.Where(i => dateList.Contains(i.fulldate)).Count() > 0) Responser.Response(HttpStatusCode.Forbidden, "İlan belirtilen tarih için müsait değil.");
 
             // create rezervation
             Rezervations rezervation = new Rezervations
@@ -226,7 +228,7 @@ namespace rest_api.Controllers
                 user_id = user.id,
                 day_price = advert.price,
                 owner = advert.user_id
-                
+
             };
 
             db.rezervations.Add(rezervation);
@@ -277,11 +279,9 @@ namespace rest_api.Controllers
             NetGsm.Send(owner.gsm, "#" + advert.id + " nolu ilaniniz icin toplam " + rezervation.days + " günlük (" + rezervation.total_price + " TL) rezervasyon talebi oluşturuldu. - Menkule.com.tr");
 
             //send mail
-            Mailgun.Send("rezervation", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.lastname) }, { "advert_id", advert.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days}, {"price", rezervation.total_price + " TL." } }, owner.email, "Yeni rezervasyon talebi");
+            Mailgun.Send("rezervation", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.lastname) }, { "advert_id", advert.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days }, { "price", rezervation.total_price + " TL." } }, owner.email, "Yeni rezervasyon talebi");
 
             return Ok();
-
-            
 
         }
 
