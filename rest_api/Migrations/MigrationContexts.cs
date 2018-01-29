@@ -36,6 +36,8 @@ namespace rest_api.Models
         public DbSet<Users> Users { get; set; }
         public DbSet<UserMessages> UserMessages { get; set;}
         public DbSet<Messages> Messages { get; set; }
-     
+        public DbSet<AdvertViews> AdvertViews { get; set; }
+
+
     }
 }

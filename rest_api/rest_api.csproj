@@ -231,6 +231,7 @@
     <Compile Include="Models\AdvertScores.cs" />
     <Compile Include="Models\AdvertTypes.cs" />
     <Compile Include="Models\AdvertUnavailableDate.cs" />
+    <Compile Include="Models\AdvertViews.cs" />
     <Compile Include="Models\Cities.cs" />
     <Compile Include="Models\Images.cs" />
     <Compile Include="Models\Messages.cs" />

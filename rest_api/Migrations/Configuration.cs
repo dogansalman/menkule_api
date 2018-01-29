@@ -11,6 +11,7 @@ namespace rest_api.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
         }
 
         DatabaseContext db = new DatabaseContext();
@@ -22,7 +23,11 @@ namespace rest_api.Migrations
                 at => at.name,
                 new Models.AdvertTypes { name = "Villa"},
                 new Models.AdvertTypes { name = "Oda" },
-                new Models.AdvertTypes { name = "Tüm Ev" }
+                new Models.AdvertTypes { name = "Müstakil Ev" },
+                new Models.AdvertTypes { name = "Kamp-Çadır" },
+                new Models.AdvertTypes { name = "Daire" },
+                new Models.AdvertTypes { name = "Pansiyon" },
+                new Models.AdvertTypes { name = "Otel" }
                 );
 
             // Seed Cities and Towns
