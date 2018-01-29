@@ -212,7 +212,7 @@ namespace rest_api.Controllers
             {
                 dateList.Add(date);
             }
-            if (db.advert_unavaiable_dates.Where(i => dateList.Contains(i.fulldate)).Count() > 0) Responser.Response(HttpStatusCode.Forbidden, "İlan belirtilen tarih için müsait değil.");
+            if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && dateList.Contains(i.fulldate)).Count() > 0 ) Responser.Response(HttpStatusCode.Forbidden, "İlan belirtilen tarih için müsait değil.");
 
             // create rezervation
             Rezervations rezervation = new Rezervations
