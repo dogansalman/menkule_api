@@ -16,7 +16,7 @@ namespace rest_api.Controllers
         public object find([FromBody] _LatitudeLongitude cordinates)
         {
             return (from a in db.advert
-                    where a.latitude <= cordinates.lat && a.longitude <= cordinates.lng
+                    where a.latitude <= cordinates.lat && a.longitude >= cordinates.lng
                     join c in db.cities on a.city_id equals c.id
                     join t in db.towns on a.town_id equals t.id
                     join p in db.advert_properties on a.id equals p.advert_id
