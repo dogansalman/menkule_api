@@ -22,7 +22,7 @@ namespace rest_api.Controllers
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             if (!db.advert.Any(a => a.user_id == user_id && a.id == id)) return NotFound();
 
-            db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(uad => uad.advert_id == id));
+            db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(uad => uad.advert_id == id && uad.rezervation_id == 0));
 
             if ( dates != null)
             {
