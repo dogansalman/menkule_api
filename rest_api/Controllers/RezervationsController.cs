@@ -369,6 +369,9 @@ namespace rest_api.Controllers
                 if (user == null) return NotFound();
                 db.SaveChanges();
 
+                Notifications notify = new Notifications();
+                notify.add(user.id, "#" + rezervation.id + " nolu " + rezervation.days + " günlük rezervasyon talebi iptal edildi!");
+
                 //Send sms
                 NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz iptal edildi. - Menkule.com.tr");
             }
@@ -379,6 +382,16 @@ namespace rest_api.Controllers
                 int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
                 if (!(dateDiff <= 0 || is_cancel ? false : true)) Responser.Response(HttpStatusCode.Forbidden, "Bu rezervasyon iptal süresi dışındadır!");
                 db.SaveChanges();
+
+                Users advert_owner = db.users.Find(rezervation.owner);
+                if(advert_owner != null)
+                {
+                    //Send sms
+                    NetGsm.Send(advert_owner.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyon talebi iptal edildi. - Menkule.com.tr");
+                    Notifications notify = new Notifications();
+                    notify.add(advert_owner.id, "#" + rezervation.id + " nolu " + rezervation.days + " günlük rezervasyon talebi iptal edildi!");
+                }
+                
             }
 
             return Ok();

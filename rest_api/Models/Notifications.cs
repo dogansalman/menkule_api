@@ -16,7 +16,7 @@ namespace rest_api.Models
                     user_id = user_id,
                     title = title,
                     created_date = DateTime.Now,
-                    state = false
+                    state = true
                 };
                 db.notifications.Add(notify);
                 Socket.Emit(user_id, "notification", notify);
