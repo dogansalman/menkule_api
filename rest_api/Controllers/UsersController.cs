@@ -60,7 +60,7 @@ namespace rest_api.Controllers
                     };
             var content = new FormUrlEncodedContent(pairs);
             // Attempt to get a token from the token endpoint of the Web Api host:
-            HttpResponseMessage response = client.PostAsync("http://localhost:9090/auth", content).Result;
+            HttpResponseMessage response = client.PostAsync("https://webapi.menkule.com.tr/auth", content).Result;
             var result = response.Content.ReadAsStringAsync().Result;
             // De-Serialize into a dictionary and return:
             Dictionary<string, string> tokenDictionary =
