@@ -49,7 +49,7 @@ namespace rest_api.Libary.NetGsm
             ss += "<no>90" + gsm + "</no>";
             ss += "</body>";
             ss += "</mainbody>";
-            //XMLPOST("http://api.netgsm.com.tr/xmlbulkhttppost.asp", ss);
+            XMLPOST("http://api.netgsm.com.tr/xmlbulkhttppost.asp", ss);
             return true;
         }
 
