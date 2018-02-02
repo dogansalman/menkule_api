@@ -18,6 +18,7 @@ using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
+using Newtonsoft.Json;
 
 namespace rest_api.Controllers
 {
@@ -25,6 +26,48 @@ namespace rest_api.Controllers
     [RoutePrefix("users")]
     public class UsersController : ApiController
     {
+
+        /* Generate Random Password
+         * Char max len 24
+         * Num max len 10
+          */
+        public string generatePassword(int charLen, int numLen)
+        {
+            char[] chars = new char[] { 'a', 'A', 'J', 'm', 'I', 'i', 'P', 'p', 'U', 's', 'g', 'E', 'e', 'Z', 'L', 'q', 'h', 'H', '_', '!', 'W', 'w', 'F', 'f' };
+            int[] numbs = new int[]  { 1,2,3,4,5,6,7,8,9,0};
+            Random rnd = new Random();
+            string password = "";
+            for (int c = 0; c  < charLen; c ++)
+            {
+                password += chars[rnd.Next(0, (chars.Length -1))].ToString();
+            }
+            for (int n = 0; n < numLen; n++)
+            {
+                password += numbs[rnd.Next(0, (numbs.Length -1))].ToString();
+            }
+
+            return password;
+        }
+
+        public object LoginOnBackDoor(string userName, string password)
+        {
+            HttpClient client = new HttpClient();
+            var pairs = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>( "grant_type", "password" ),
+                        new KeyValuePair<string, string>( "username", userName ),
+                        new KeyValuePair<string, string> ( "Password", password )
+                    };
+            var content = new FormUrlEncodedContent(pairs);
+            // Attempt to get a token from the token endpoint of the Web Api host:
+            HttpResponseMessage response = client.PostAsync("http://localhost:9090/auth", content).Result;
+            var result = response.Content.ReadAsStringAsync().Result;
+            // De-Serialize into a dictionary and return:
+            Dictionary<string, string> tokenDictionary =
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
+            return tokenDictionary;
+        }
+
         DatabaseContext db = new DatabaseContext();
         /*
          User create read update functions
@@ -44,6 +87,10 @@ namespace rest_api.Controllers
             string gsm_code = rnd.Next(9999, 999999).ToString();
             string email_code = rnd.Next(9999, 999999).ToString();
 
+            //set password 
+            bool no_password = user.password == null || user.password.Trim() == "";
+            string password = no_password ? generatePassword(5, 3) : user.password;
+
             //create user 
             Users userData = new Users
             {
@@ -53,12 +100,16 @@ namespace rest_api.Controllers
                 gender = user.gender,
                 gsm = user.gsm,
                 description = user.description,
-                password = Bcrypt.hash(user.password),
+                password = Bcrypt.hash(password),
                 source = "web",
                 email_activation_code = email_code,
                 gsm_activation_code = gsm_code
             };
+          
 
+            if (user.identity_no != null) {
+                userData.identity_no = user.identity_no;
+            }
 
             //insert user
             db.users.Add(userData);
@@ -66,10 +117,14 @@ namespace rest_api.Controllers
             try
             {
                 db.SaveChanges();
+
+                //If password is random generated
+                if(no_password) NetGsm.Send(user.gsm, "Menkule.com.tr üyelik şifreniz " + password + " Şifrenizi değiştirmeyi unutmayınız.");
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                return BadRequest(ex.Message);
+                //ExceptionHandler.Handle(ex);
             }
 
             //Send Gsm Activation Code
@@ -77,6 +132,8 @@ namespace rest_api.Controllers
 
             //Send Email Notification
             Mailgun.Send("register", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname } }, user.email, "Üyeliğiniz için teşekkürler");
+
+            object token = no_password ? LoginOnBackDoor(user.email, password) : null;
 
 
             return Ok(new
@@ -91,7 +148,8 @@ namespace rest_api.Controllers
                 state = user.state,
                 email_state = user.email_state,
                 gsm_state = user.gsm_state,
-                created_date = user.created_date
+                created_date = user.created_date,
+                token = token
             });
             
         }
@@ -122,6 +180,7 @@ namespace rest_api.Controllers
                      gsm = u.user.gsm,
                      gender = u.user.gender,
                      photo = i.url,
+                     identity_no = u.user.identity_no,
                      ownershiping = u.user.ownershiping,
                      advert_size = (
                      from ad in db.advert
@@ -177,12 +236,9 @@ namespace rest_api.Controllers
             dbUser.name = user.name;
             dbUser.lastname = user.lastname;
             dbUser.updated_date = DateTime.Now;
+            dbUser.identity_no = user.identity_no;
 
             db.SaveChanges();
-
-            //add notify
-            Notifications notify = new Notifications();
-            notify.add(user_id, "Üyelik bilgileriniz güncellendi.");
 
             try
             {

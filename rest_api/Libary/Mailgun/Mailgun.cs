@@ -33,7 +33,7 @@ namespace rest_api.Libary.Mailgun
             request.AddParameter("html", RenderTemplate(templateName));
             request.AddParameter("recipient-variables", "{\"" + toAdress + "\": " + JsonHelper.JsonHelper.DictionaryToJson(recipientVariables) + "}");
             request.Method = Method.POST;
-            client.Execute(request);
+            //client.Execute(request);
         }
 
         private static string RenderTemplate(string templateName)

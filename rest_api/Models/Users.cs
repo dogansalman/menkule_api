@@ -47,8 +47,6 @@ namespace rest_api.Models
             get { return _email; }
             set { _email = value.ToLower(); }
         }
-
-        [Required]
         [StringLength(255)]
         public string password { get; set; }
         [Required]
@@ -72,6 +70,9 @@ namespace rest_api.Models
         public string facebook_id { get; set; }
         public DateTime? gsm_last_update { get; set; }
         public bool ownershiping { get; set; }
+        [StringLength(11)]
+        [MinLength(11)]
+        public string identity_no { get; set; } = null;
         public bool state { get; set; }
         [StringLength(255)]
         public string description { get; set; }

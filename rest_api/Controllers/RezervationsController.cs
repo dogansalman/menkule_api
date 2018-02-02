@@ -195,8 +195,7 @@ namespace rest_api.Controllers
             int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
             Users user = db.users.Where(u => u.id == user_id && u.state == true).FirstOrDefault();
             if (user == null) Responser.Response(HttpStatusCode.Forbidden, "Lütfen hesabınızı doğrulayın.");
-
-
+            
             // existence
             Advert advert = db.advert.Where(a => a.state == true && a.id == _rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
