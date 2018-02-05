@@ -97,88 +97,99 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public object get(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-            
-            var rezervation = (
-                           from r in db.rezervations
-                           where r.owner == user_id || r.user_id == user_id
-                           where r.id == id
-                           join ra in db.rezervation_adverts on r.id equals ra.rezervation_id
-                           join c in db.cities on ra.city_id equals c.id
-                           join t in db.towns on ra.town_id equals t.id
-                           join p in db.advert_properties on r.advert_id equals p.advert_id
-                           join pos in db.advert_possibilities on r.advert_id equals pos.advert_id
-                           join at in db.advert_types on ra.advert_type_id equals at.id
-
-                           select new _RezervationDetails {
-                               id = r.id,
-                               checkin = r.checkin,
-                               checkout = r.checkout,
-                               advert_id = r.advert_id,
-                               days = r.days,
-                               day_price = r.day_price,
-                               total_price = r.total_price,
-                               user_id = r.user_id,
-                               visitor = r.visitor,
-                               description_state = r.description_state,
-                               note = r.note,
-                               is_cancel = r.is_cancel,
-                               state = r.state,
-                               created_date = r.created_date,
-                               updated_date = r.updated_date,
-                               rezervation_advert = new _RezervationAdvert {
-                                   advert = ra,
-                                   images = (db.advert_images.GroupJoin(
-                                               db.images,
-                                               aimg => aimg.image_id,
-                                               i => i.id,
-                                               (ai, i) => new { advertimg = ai, image = i }
-                                               )
-                                               .Where(aimg => aimg.advertimg.advert_id == ra.advert_id)
-                                               .SelectMany(AdvertWithImage =>
-                                               AdvertWithImage.image).ToList()),
-                                   advert_type = at,
-                                   cities = c,
-                                   possibilities = pos,
-                                   properties = p,
-                                   towns = t
-                               },
-                               visitors = (db.rezervation_visitors.Where(v => v.rezervation_id == r.id)).ToList()
-                           }
-                           ).FirstOrDefault();
-
-            // user informations validation
-            int _user_id = user_id == rezervation.rezervation_advert.advert.user_id ? rezervation.user_id: rezervation.rezervation_advert.advert.user_id;
-            rezervation.advert_owner = rezervation.rezervation_advert.advert.user_id == user_id ? true : false;
-            var user = (
-                    from u in db.users
-                    where u.id == _user_id
-                    join uimg in db.images on u.image_id equals uimg.id into j1
-                    from j2 in j1.DefaultIfEmpty()
-                    select new _RezervationUserInfo
-                    {
-                        id = u.id,
-                        fullname = u.name + " " + u.lastname,
-                        gsm = u.gsm,
-                        photo = j2.url
-                    }).FirstOrDefault();
-
-            rezervation.user_information = user;
-            if(rezervation.state == false)
+            try
             {
-                rezervation.user_information.gsm = rezervation.user_information.gsm.Substring(0, rezervation.user_information.gsm.Length - 4) + "****";
+                var claimsIdentity = User.Identity as ClaimsIdentity;
+                int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+                var rezervation = (
+                               from r in db.rezervations
+                               where r.owner == user_id || r.user_id == user_id
+                               where r.id == id
+                               join ra in db.rezervation_adverts on r.id equals ra.rezervation_id
+                               join c in db.cities on ra.city_id equals c.id
+                               join t in db.towns on ra.town_id equals t.id
+                               join p in db.advert_properties on r.advert_id equals p.advert_id
+                               join pos in db.advert_possibilities on r.advert_id equals pos.advert_id
+                               join at in db.advert_types on ra.advert_type_id equals at.id
+
+                               select new _RezervationDetails
+                               {
+                                   id = r.id,
+                                   checkin = r.checkin,
+                                   checkout = r.checkout,
+                                   advert_id = r.advert_id,
+                                   days = r.days,
+                                   day_price = r.day_price,
+                                   total_price = r.total_price,
+                                   user_id = r.user_id,
+                                   visitor = r.visitor,
+                                   description_state = r.description_state,
+                                   note = r.note,
+                                   is_cancel = r.is_cancel,
+                                   state = r.state,
+                                   created_date = r.created_date,
+                                   updated_date = r.updated_date,
+                                   rezervation_advert = new _RezervationAdvert
+                                   {
+                                       advert = ra,
+                                       images = (db.advert_images.GroupJoin(
+                                                   db.images,
+                                                   aimg => aimg.image_id,
+                                                   i => i.id,
+                                                   (ai, i) => new { advertimg = ai, image = i }
+                                                   )
+                                                   .Where(aimg => aimg.advertimg.advert_id == ra.advert_id)
+                                                   .SelectMany(AdvertWithImage =>
+                                                   AdvertWithImage.image).ToList()),
+                                       advert_type = at,
+                                       cities = c,
+                                       possibilities = pos,
+                                       properties = p,
+                                       towns = t
+                                   },
+                                   visitors = (db.rezervation_visitors.Where(v => v.rezervation_id == r.id)).ToList()
+                               }
+                               ).FirstOrDefault();
+
+                // user informations validation
+                int _user_id = user_id == rezervation.rezervation_advert.advert.user_id ? rezervation.user_id : rezervation.rezervation_advert.advert.user_id;
+                rezervation.advert_owner = rezervation.rezervation_advert.advert.user_id == user_id ? true : false;
+                var user = (
+                        from u in db.users
+                        where u.id == _user_id
+                        join uimg in db.images on u.image_id equals uimg.id into j1
+                        from j2 in j1.DefaultIfEmpty()
+                        select new _RezervationUserInfo
+                        {
+                            id = u.id,
+                            fullname = u.name + " " + u.lastname,
+                            gsm = u.gsm,
+                            photo = j2.url
+                        }).FirstOrDefault();
+
+                rezervation.user_information = user;
+                if (rezervation.state == false)
+                {
+                    rezervation.user_information.gsm = rezervation.user_information.gsm.Substring(0, rezervation.user_information.gsm.Length - 4) + "****";
+                }
+
+                // rezervation is cancalable
+                if (!rezervation.advert_owner)
+                {
+                    DateTime lastCanceleableDate = rezervation.checkin.AddDays(-rezervation.rezervation_advert.advert.cancel_time);
+                    DateTime EndDate = DateTime.Now;
+                    int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
+                    rezervation.is_cancelable = dateDiff <= 0 || rezervation.is_cancel ? false : true;
+                }
+                return rezervation;
+            }
+            catch (Exception ex)
+            {
+                Responser.Response(HttpStatusCode.NotImplemented, ex.Message.ToString());
             }
 
-            // rezervation is cancalable
-            if(!rezervation.advert_owner)
-            {
-                DateTime lastCanceleableDate = rezervation.checkin.AddDays(-rezervation.rezervation_advert.advert.cancel_time);
-                DateTime EndDate = DateTime.Now;
-                int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
-                rezervation.is_cancelable = dateDiff <= 0 || rezervation.is_cancel ? false : true;
-            }
-            return rezervation;
+            return NotFound();
         }
 
         // Create
