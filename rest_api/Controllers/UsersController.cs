@@ -27,47 +27,7 @@ namespace rest_api.Controllers
     public class UsersController : ApiController
     {
 
-        /* Generate Random Password
-         * Char max len 24
-         * Num max len 10
-          */
-        public string generatePassword(int charLen, int numLen)
-        {
-            char[] chars = new char[] { 'a', 'A', 'J', 'm', 'I', 'i', 'P', 'p', 'U', 's', 'g', 'E', 'e', 'Z', 'L', 'q', 'h', 'H', '_', '!', 'W', 'w', 'F', 'f' };
-            int[] numbs = new int[]  { 1,2,3,4,5,6,7,8,9,0};
-            Random rnd = new Random();
-            string password = "";
-            for (int c = 0; c  < charLen; c ++)
-            {
-                password += chars[rnd.Next(0, (chars.Length -1))].ToString();
-            }
-            for (int n = 0; n < numLen; n++)
-            {
-                password += numbs[rnd.Next(0, (numbs.Length -1))].ToString();
-            }
-
-            return password;
-        }
-
-        public object LoginOnBackDoor(string userName, string password)
-        {
-            HttpClient client = new HttpClient();
-            var pairs = new List<KeyValuePair<string, string>>
-                    {
-                        new KeyValuePair<string, string>( "grant_type", "password" ),
-                        new KeyValuePair<string, string>( "username", userName ),
-                        new KeyValuePair<string, string> ( "Password", password )
-                    };
-            var content = new FormUrlEncodedContent(pairs);
-            // Attempt to get a token from the token endpoint of the Web Api host:
-            HttpResponseMessage response = client.PostAsync("https://webapi.menkule.com.tr/auth", content).Result;
-            var result = response.Content.ReadAsStringAsync().Result;
-            // De-Serialize into a dictionary and return:
-            Dictionary<string, string> tokenDictionary =
-                JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
-            return tokenDictionary;
-        }
-
+        
         DatabaseContext db = new DatabaseContext();
         /*
          User create read update functions
@@ -89,7 +49,7 @@ namespace rest_api.Controllers
 
             //set password 
             bool no_password = user.password == null || user.password.Trim() == "";
-            string password = no_password ? generatePassword(5, 3) : user.password;
+            string password = no_password ? Users.generatePassword(5, 3) : user.password;
 
             //create user 
             Users userData = new Users
@@ -133,7 +93,7 @@ namespace rest_api.Controllers
             //Send Email Notification
             Mailgun.Send("register", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname } }, user.email, "Üyeliğiniz için teşekkürler");
 
-            object token = no_password ? LoginOnBackDoor(user.email, password) : null;
+            object token = no_password ? Users.LoginOnBackDoor(user.email, password) : null;
 
 
             return Ok(new

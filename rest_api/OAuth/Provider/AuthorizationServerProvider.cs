@@ -13,9 +13,10 @@ namespace rest_api.OAuth.Provider
     public class AuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
         // OAuthAuthorizationServerProvider sınıfının client erişimine izin verebilmek için ilgili ValidateClientAuthentication metotunu override ediyoruz.
-        public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
+        public override  Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
            context.Validated();
+           return Task.FromResult<object>(null);
         }
 
         DatabaseContext db = new DatabaseContext();
@@ -27,21 +28,18 @@ namespace rest_api.OAuth.Provider
             // Kullanıcının access_token alabilmesi için gerekli validation işlemlerini yapıyoruz.
             string pass = Bcrypt.hash(context.Password);
             Users usr = db.users.Where(u => u.email == context.UserName && u.password == pass).FirstOrDefault();
-            if (usr != null)
-            {
-                var identity = new ClaimsIdentity(context.Options.AuthenticationType);
-                identity.AddClaim(new Claim("user_id", usr.id.ToString()));
-
-                //Role eklemek için
-                if(usr.ownershiping) identity.AddClaim(new Claim(ClaimTypes.Role, "owner"));
-                context.Validated(identity);
-            }
-            else
+            if (usr == null)
             {
                 context.SetError("invalid_grant", "Kullanıcı adı veya şifre yanlış.");
+                return;
             }
-        }
+            var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+            identity.AddClaim(new Claim("user_id", usr.id.ToString()));
 
+            //Role eklemek için
+            if (usr.ownershiping) identity.AddClaim(new Claim(ClaimTypes.Role, "owner"));
+            context.Validated(identity);
+        }
 
         public override Task MatchEndpoint(OAuthMatchEndpointContext context)
         {
@@ -54,7 +52,7 @@ namespace rest_api.OAuth.Provider
             }
             return base.MatchEndpoint(context);
         }
-
+  
         private void SetCORSPolicy(IOwinContext context)
         {
             string allowedUrls = "http://localhost:9000, http://www.menkule.com.tr, https://www.menkule.com.tr";

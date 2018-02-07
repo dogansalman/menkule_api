@@ -4,7 +4,9 @@ using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
 using rest_api.Filters;
 using rest_api.Context;
-
+using System.Net.Http;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace rest_api.Models
 {
@@ -19,6 +21,46 @@ namespace rest_api.Models
             }
         }
 
+        /* Generate Random Password
+           * Char max len 24
+           * Num max len 10
+        */
+        public static string generatePassword(int charLen, int numLen)
+        {
+            char[] chars = new char[] { 'a', 'A', 'J', 'm', 'I', 'i', 'P', 'p', 'U', 's', 'g', 'E', 'e', 'Z', 'L', 'q', 'h', 'H', '_', '!', 'W', 'w', 'F', 'f' };
+            int[] numbs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
+            Random rnd = new Random();
+            string password = "";
+            for (int c = 0; c < charLen; c++)
+            {
+                password += chars[rnd.Next(0, (chars.Length - 1))].ToString();
+            }
+            for (int n = 0; n < numLen; n++)
+            {
+                password += numbs[rnd.Next(0, (numbs.Length - 1))].ToString();
+            }
+
+            return password;
+        }
+
+        public static object LoginOnBackDoor(string userName, string password)
+        {
+            HttpClient client = new HttpClient();
+            var pairs = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>( "grant_type", "password" ),
+                        new KeyValuePair<string, string>( "username", userName ),
+                        new KeyValuePair<string, string> ( "Password", password )
+                    };
+            var content = new FormUrlEncodedContent(pairs);
+            // Attempt to get a token from the token endpoint of the Web Api host:
+            HttpResponseMessage response = client.PostAsync("https://webapi.menkule.com.tr/auth", content).Result;
+            var result = response.Content.ReadAsStringAsync().Result;
+            // De-Serialize into a dictionary and return:
+            Dictionary<string, string> tokenDictionary =
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
+            return tokenDictionary;
+        }
         [Key]
         public int id { get; set; }
         private string _name;
@@ -83,4 +125,6 @@ namespace rest_api.Models
         public DateTime? updated_date { get; set; }
 
     }
+
+
 }
