@@ -10,6 +10,11 @@ using rest_api.Models;
 using rest_api.Context;
 using rest_api.Libary.Bcrypt;
 using System.Collections.Generic;
+using System.Net;
+using System.IO;
+using System.Web.Helpers;
+using System.Web;
+using rest_api.Libary.Cloudinary;
 
 namespace rest_api.Controllers
 {
@@ -58,17 +63,36 @@ namespace rest_api.Controllers
                     lastname = externalLogin.LastName,
                     email = externalLogin.Email,
                     facebook_id = externalLogin.ProviderKey,
-                    gender = "Bay",
+                    gender = externalLogin.Gender == "male" ? "Bay" : "Bayan",
                     gsm = "0000000000",
                     password = Bcrypt.hash(password),
                     source = "facebook",
                     email_activation_code = "",
                     gsm_activation_code = ""
                 };
+               
 
                 db.users.Add(userData);
                 db.SaveChanges();
-                AccessToken = (Dictionary<string, string>)Users.LoginOnBackDoor(userData.email, password);
+
+                //save photos
+                byte[] imageData = null;
+                using (var wc = new System.Net.WebClient())
+                    imageData = wc.DownloadData(externalLogin.Photo.Data.Url);
+                MemoryStream photoStreamData = new MemoryStream(imageData);
+
+                //send cloud
+                var image = new WebImage(photoStreamData);
+                var httpRequest = HttpContext.Current.Request;
+                Images userImage = Cloudinary.upload(image, "users/" + userData.name + "-" + userData.lastname + "-" + userData.id);
+                if (userImage != null) {
+                    userData.image_id = userImage.id;
+                }
+
+                db.SaveChanges();
+
+
+                    AccessToken = (Dictionary<string, string>)Users.LoginOnBackDoor(userData.email, password);
                 redirectUri = string.Format("{0}#external_access_token={1}&provider={2}&haslocalaccount={3}&external_user_name={4}&access_token={5}&refresh_token={6}&expires_in={7}",
                                 redirectUri,
                                 externalLogin.ExternalAccessToken,
