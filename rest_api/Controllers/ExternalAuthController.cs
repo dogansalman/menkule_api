@@ -15,6 +15,10 @@ using System.IO;
 using System.Web.Helpers;
 using System.Web;
 using rest_api.Libary.Cloudinary;
+using rest_api.OAuth.Provider;
+using Microsoft.Owin.Security.OAuth;
+using rest_api.OAuth;
+using Microsoft.Owin.Security;
 
 namespace rest_api.Controllers
 {
@@ -91,8 +95,7 @@ namespace rest_api.Controllers
 
                 db.SaveChanges();
 
-
-                    AccessToken = (Dictionary<string, string>)Users.LoginOnBackDoor(userData.email, password);
+                AccessToken = (Dictionary<string, string>)Users.LoginOnBackDoor(userData.email, password);
                 redirectUri = string.Format("{0}#external_access_token={1}&provider={2}&haslocalaccount={3}&external_user_name={4}&access_token={5}&refresh_token={6}&expires_in={7}",
                                 redirectUri,
                                 externalLogin.ExternalAccessToken,
@@ -107,9 +110,27 @@ namespace rest_api.Controllers
                 return Redirect(redirectUri);
 
             }
-           
-       
 
+
+            /*
+             * TODO access token güzel ama refresh token expire date tüm bilgiyi döndürmek lazım
+             */
+            var tokenExpiration = TimeSpan.FromHours(12);
+
+            ClaimsIdentity identity = new ClaimsIdentity(OAuthDefaults.AuthenticationType);
+            identity.AddClaim(new Claim(ClaimTypes.Name, user.name));
+            identity.AddClaim(new Claim("user_id", user.id.ToString()));
+
+            var props = new AuthenticationProperties()
+            {
+                IssuedUtc = DateTime.UtcNow,
+                ExpiresUtc = DateTime.UtcNow.Add(tokenExpiration),
+            };
+
+            var ticket = new AuthenticationTicket(identity, props);
+            
+            var accessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
+            
             return Redirect(redirectUri);
 
         }
