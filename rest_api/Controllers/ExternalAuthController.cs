@@ -1,24 +1,24 @@
 ﻿using System;
+using System.IO;
+using System.Web;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using System.Collections.Generic;
+using System.Web.Helpers;
 using rest_api.OAuth.FacebookResults;
 using rest_api.Models;
 using rest_api.Context;
 using rest_api.Libary.Bcrypt;
-using System.Collections.Generic;
-using System.Net;
-using System.IO;
-using System.Web.Helpers;
-using System.Web;
 using rest_api.Libary.Cloudinary;
-using rest_api.OAuth.Provider;
-using Microsoft.Owin.Security.OAuth;
-using rest_api.OAuth;
+using rest_api.OAuth.AuthBackdoor;
+
+
 using Microsoft.Owin.Security;
+
 
 namespace rest_api.Controllers
 {
@@ -53,12 +53,15 @@ namespace rest_api.Controllers
             if (externalLogin == null) return InternalServerError();
 
             // Exist user in db
-            Users user = db.users.Where(u => u.facebook_id == externalLogin.ProviderKey && u.email == externalLogin.Email).FirstOrDefault();
+            Users user = db.users.Where(u => u.facebook_id == externalLogin.ProviderKey && u.email == externalLogin.Email && u.source == "facebook").FirstOrDefault();
             bool hasRegistered = user != null;
 
             // If not identity register to db add new user
             if (!hasRegistered)
             {
+
+                // check user e-mail exist validation
+
                 string password = Users.generatePassword(5, 3);
                 //create user 
                 Users userData = new Users
@@ -94,47 +97,28 @@ namespace rest_api.Controllers
                 }
 
                 db.SaveChanges();
-
-                AccessToken = (Dictionary<string, string>)Users.LoginOnBackDoor(userData.email, password);
-                redirectUri = string.Format("{0}#external_access_token={1}&provider={2}&haslocalaccount={3}&external_user_name={4}&access_token={5}&refresh_token={6}&expires_in={7}",
-                                redirectUri,
-                                externalLogin.ExternalAccessToken,
-                                externalLogin.LoginProvider,
-                                hasRegistered.ToString(),
-                                externalLogin.UserName,
-                                AccessToken["access_token"],
-                                AccessToken["refresh_token"],
-                                AccessToken["expires_in"]
-                                );
-
-                return Redirect(redirectUri);
+                
+                return Redirect(GenerateRedirectUrl(AuthBackdoor.auth(userData, Request), externalLogin, hasRegistered, redirectUri));
 
             }
-
-
-            /*
-             * TODO access token güzel ama refresh token expire date tüm bilgiyi döndürmek lazım
-             */
-            var tokenExpiration = TimeSpan.FromHours(12);
-
-            ClaimsIdentity identity = new ClaimsIdentity(OAuthDefaults.AuthenticationType);
-            identity.AddClaim(new Claim(ClaimTypes.Name, user.name));
-            identity.AddClaim(new Claim("user_id", user.id.ToString()));
-
-            var props = new AuthenticationProperties()
-            {
-                IssuedUtc = DateTime.UtcNow,
-                ExpiresUtc = DateTime.UtcNow.Add(tokenExpiration),
-            };
-
-            var ticket = new AuthenticationTicket(identity, props);
-            
-            var accessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
-            
-            return Redirect(redirectUri);
-
+            return Redirect(GenerateRedirectUrl(AuthBackdoor.auth(user, Request), externalLogin, hasRegistered,redirectUri));
         }
-       
+
+        private string GenerateRedirectUrl(AuthenticationProperties prop, UserFacebook externalLogin, bool hasRegistered, string redirectUri)
+        {
+            dynamic timeoffset = prop.ExpiresUtc - DateTimeOffset.UtcNow;          
+            return  string.Format("{0}?external_access_token={1}&provider={2}&haslocalaccount={3}&external_user_name={4}&access_token={5}&refresh_token={6}&expires_in={7}&token_type={8}",
+                            redirectUri,
+                            externalLogin.ExternalAccessToken,
+                            externalLogin.LoginProvider,
+                            hasRegistered.ToString(),
+                            externalLogin.UserName,
+                            prop.Dictionary["access_token"],
+                            prop.Dictionary["refresh_token"],
+                            timeoffset.Ticks.ToString().Substring(0, 5),
+                            "bearer"
+                            );
+        }
         private string ValidateClientAndRedirectUri(HttpRequestMessage request, ref string redirectUriOutput)
         {
 

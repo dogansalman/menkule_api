@@ -18,5 +18,9 @@ namespace rest_api.OAuth.Provider
             }
             return Task.FromResult<object>(null);
         }
+        public override void ApplyRedirect(FacebookApplyRedirectContext context)
+        {
+            context.Response.Redirect(context.RedirectUri + "&display=popup");
+        }
     }
 }

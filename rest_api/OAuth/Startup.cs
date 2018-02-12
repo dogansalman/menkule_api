@@ -17,7 +17,15 @@ namespace rest_api.OAuth
     {
         public static OAuthBearerAuthenticationOptions OAuthBearerOptions { get; private set; }
         public static FacebookAuthenticationOptions facebookAuthOptions { get; private set; }
-
+        public static OAuthAuthorizationServerOptions oAuthAuthorizationServerOptions = new OAuthAuthorizationServerOptions()
+        {
+            AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
+            TokenEndpointPath = new PathString("/auth"), // token alacağımız path'i belirtiyoruz
+            AccessTokenExpireTimeSpan = TimeSpan.FromHours(12),
+            AllowInsecureHttp = true,
+            Provider = new AuthorizationServerProvider(),
+            RefreshTokenProvider = new RefreshTokenProvider()
+        };
 
         public void Configuration(IAppBuilder appBuilder)
         {
@@ -33,18 +41,6 @@ namespace rest_api.OAuth
             //use a cookie to temporarily store information about a user logging in with a third party login provider
             appBuilder.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
             OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
-            
-
-          
-            OAuthAuthorizationServerOptions oAuthAuthorizationServerOptions = new OAuthAuthorizationServerOptions()
-            {
-                AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                TokenEndpointPath = new PathString("/auth"), // token alacağımız path'i belirtiyoruz
-                AccessTokenExpireTimeSpan = TimeSpan.FromHours(12),
-                AllowInsecureHttp = true,
-                Provider = new AuthorizationServerProvider(),
-                RefreshTokenProvider = new RefreshTokenProvider()
-            };
 
             // AppBuilder'a token üretimini gerçekleştirebilmek için ilgili authorization ayarlarımızı veriyoruz.
             appBuilder.UseOAuthAuthorizationServer(oAuthAuthorizationServerOptions);
@@ -70,6 +66,7 @@ namespace rest_api.OAuth
             // Bearer token üzerinde güvenlik SSL'e dayanır.
             // Bir diğer tip ise MAC token'dır. OAuth 1.0 versiyonunda kullanılıyor, hem client'a, hemde server tarafına implementasyonlardan dolayı ek maliyet çıkartmaktadır. Bu maliyetin yanı sıra ise Bearer token'a göre kaynak alış verişinin biraz daha güvenli olduğu söyleniyor çünkü client her request'inde veriyi hmac ile imzalayıp verileri kriptolu bir şekilde göndermeleri gerektiği için.
             appBuilder.UseOAuthBearerAuthentication(OAuthBearerOptions);
+            
 
 
 
