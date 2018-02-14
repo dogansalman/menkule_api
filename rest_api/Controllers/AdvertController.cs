@@ -3,13 +3,12 @@ using System.Web;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Helpers;
-using System.Security.Claims;
 using System.Collections.Generic;
 using System.Web.UI.WebControls;
 using System.Web.Http.Description;
 using rest_api.Context;
 using rest_api.Models;
-using rest_api.Libary.Exceptions;
+using rest_api.Libary.Exceptions.ExceptionThrow;
 using rest_api.Libary.Cloudinary;
 using rest_api.OAuth.CustomAttributes.Owner;
 
@@ -26,8 +25,7 @@ namespace rest_api.Controllers
         [Route("")]
         public object get()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             return (from a in db.advert
                     where a.user_id == user_id
                     from aimg in db.advert_images
@@ -70,8 +68,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public object detail(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             return (from a in db.advert
                     where a.user_id == user_id && a.id == id
@@ -131,9 +128,8 @@ namespace rest_api.Controllers
         [Route("")]
         public IHttpActionResult add([FromBody] Advert advert)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-            
+            int user_id = Users.GetUserId(User);
+
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             advert.user_id = user_id;
@@ -208,7 +204,7 @@ namespace rest_api.Controllers
             catch (System.Exception ex)
             {
 
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok(advert);
         }
@@ -221,8 +217,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult delete(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             Advert advert = db.advert.Where(a => a.id == id && a.user_id == user_id).FirstOrDefault();
             if (advert == null) return NotFound();
             db.advert.Remove(advert);
@@ -239,7 +234,7 @@ namespace rest_api.Controllers
             }
             catch (System.Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
 
             return Ok();
@@ -253,8 +248,7 @@ namespace rest_api.Controllers
         public IHttpActionResult update([FromBody] Advert advert, int id)
         {
             
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             if (db.advert.Where(a => a.id == id && a.user_id == user_id).FirstOrDefault() == null) return NotFound();
@@ -371,8 +365,8 @@ namespace rest_api.Controllers
         {
             try
             {
-                var claimsIdentity = User.Identity as ClaimsIdentity;
-                int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+ 
+                int user_id = Users.GetUserId(User);
                 Users user = db.users.Find(user_id);
 
                 var httpRequest = HttpContext.Current.Request;
@@ -383,6 +377,10 @@ namespace rest_api.Controllers
                 image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
 
                 Images advertImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
+
+                db.images.Add(advertImage);
+                db.SaveChanges();
+
                 if (advertImage == null) return BadRequest();
 
                 return Ok(advertImage);

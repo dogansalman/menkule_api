@@ -231,13 +231,13 @@
     </Compile>
     <Compile Include="Libary\Bcrypt\Bcrypt.cs" />
     <Compile Include="Libary\Cloudinary\Cloudinary.cs" />
-    <Compile Include="Libary\Exceptions\ExceptionHandler.cs" />
+    <Compile Include="Libary\Exceptions\ExceptionThrow\ExceptionThrow.cs" />
+    <Compile Include="Libary\Exceptions\ValidationException\ValidationException.cs" />
     <Compile Include="Libary\JsonHelper\JsonHelper.cs" />
     <Compile Include="Libary\Mailgun\Mailgun.cs" />
     <Compile Include="Libary\MailSender\MailSender.cs" />
     <Compile Include="Libary\MultipartStreamProvider\MultipartStreamProvider.cs" />
     <Compile Include="Libary\NetGsm\NetGsm.cs" />
-    <Compile Include="Libary\Responser\Responser.cs" />
     <Compile Include="Libary\Socket\Socket.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\MigrationContexts.cs" />

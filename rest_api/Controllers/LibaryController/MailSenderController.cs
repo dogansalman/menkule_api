@@ -1,8 +1,8 @@
-﻿using System.Net;
-using System.Web.Http;
+﻿using System.Web.Http;
 using rest_api.Libary.MailSender;
-using rest_api.Libary.Responser;
 using rest_api.ModelViews;
+using rest_api.Libary.Exceptions.ExceptionThrow;
+
 namespace rest_api.Controllers.LibaryController
 {
     [RoutePrefix("contact")]
@@ -13,7 +13,7 @@ namespace rest_api.Controllers.LibaryController
         public IHttpActionResult send([FromBody]_Contact message)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (!MailSender.Send(message)) Responser.Response(HttpStatusCode.NotImplemented, "Mesajınız iletilemedi. Lütfen tekrar deneyin.");
+            if (!MailSender.Send(message)) ExceptionThrow.Throw("Mesajınız iletilemedi. Lütfen tekrar deneyin.");
             return Ok();
         }
     }

@@ -4,6 +4,7 @@ using System.Web;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Microsoft.Owin.Security;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -15,9 +16,6 @@ using rest_api.Context;
 using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Cloudinary;
 using rest_api.OAuth.AuthBackdoor;
-
-
-using Microsoft.Owin.Security;
 
 
 namespace rest_api.Controllers
@@ -53,53 +51,68 @@ namespace rest_api.Controllers
             if (externalLogin == null) return InternalServerError();
 
             // Exist user in db
-            Users user = db.users.Where(u => u.facebook_id == externalLogin.ProviderKey && u.email == externalLogin.Email && u.source == "facebook").FirstOrDefault();
+            Users user = db.users.Where(u => (u.facebook_id == externalLogin.ProviderKey && u.email == externalLogin.Email && u.source == "facebook")).FirstOrDefault();
             bool hasRegistered = user != null;
 
             // If not identity register to db add new user
             if (!hasRegistered)
             {
 
-                // check user e-mail exist validation
-
-                string password = Users.generatePassword(5, 3);
-                //create user 
-                Users userData = new Users
+                try
                 {
-                    name = externalLogin.FirstName,
-                    lastname = externalLogin.LastName,
-                    email = externalLogin.Email,
-                    facebook_id = externalLogin.ProviderKey,
-                    gender = externalLogin.Gender == "male" ? "Bay" : "Bayan",
-                    gsm = "0000000000",
-                    password = Bcrypt.hash(password),
-                    source = "facebook",
-                    email_activation_code = "",
-                    gsm_activation_code = ""
-                };
-               
+                    // check user e-mail exist validation
+                    if (db.users.Any(u => u.email == externalLogin.Email)) return Redirect(GenerateErrorRedirect(externalLogin, "e-posta zaten kullanilmakta", redirectUri));
 
-                db.users.Add(userData);
-                db.SaveChanges();
+                    string password = Users.generatePassword(5, 3);
 
-                //save photos
-                byte[] imageData = null;
-                using (var wc = new System.Net.WebClient())
-                    imageData = wc.DownloadData(externalLogin.Photo.Data.Url);
-                MemoryStream photoStreamData = new MemoryStream(imageData);
-
-                //send cloud
-                var image = new WebImage(photoStreamData);
-                var httpRequest = HttpContext.Current.Request;
-                Images userImage = Cloudinary.upload(image, "users/" + userData.name + "-" + userData.lastname + "-" + userData.id);
-                if (userImage != null) {
-                    userData.image_id = userImage.id;
-                }
-
-                db.SaveChanges();
+                    // disable db validations
+                    db.Configuration.ValidateOnSaveEnabled = false;
+                    // create user 
+                    Users userData = new Users
+                    {
+                        name = externalLogin.FirstName,
+                        lastname = externalLogin.LastName,
+                        email = externalLogin.Email,
+                        facebook_id = externalLogin.ProviderKey,
+                        gender = externalLogin.Gender == "male" ? "Bay" : "Bayan",
+                        gsm = string.Empty,
+                        password = Bcrypt.hash(password),
+                        source = "facebook",
+                        email_activation_code = "",
+                        gsm_activation_code = ""
+                    };
+                    db.users.Add(userData);
+                    
                 
-                return Redirect(GenerateRedirectUrl(AuthBackdoor.auth(userData, Request), externalLogin, hasRegistered, redirectUri));
 
+                    // save photos
+                    byte[] imageData = null;
+                    using (var wc = new System.Net.WebClient())
+                        imageData = wc.DownloadData(externalLogin.Photo.Data.Url);
+                    MemoryStream photoStreamData = new MemoryStream(imageData);
+
+                    // send cloud
+                    var image = new WebImage(photoStreamData);
+                    var httpRequest = HttpContext.Current.Request;
+                    Images userImage = Cloudinary.upload(image, "users/" + userData.name + "-" + userData.lastname + "-" + userData.id);
+                    if(userImage != null)
+                    {
+                        db.images.Add(userImage);
+                        db.SaveChanges();
+                        userData.image_id = userImage.id;
+                    }
+                    
+                    db.SaveChanges();
+
+                    // enable db validations
+                    db.Configuration.ValidateOnSaveEnabled = false;
+
+                    return Redirect(GenerateRedirectUrl(AuthBackdoor.auth(userData, Request), externalLogin, hasRegistered, redirectUri));
+                }
+                catch (Exception ex)
+                {
+                    return Redirect(GenerateErrorRedirect(externalLogin, ex.Message.ToString(), redirectUri));
+                }
             }
             return Redirect(GenerateRedirectUrl(AuthBackdoor.auth(user, Request), externalLogin, hasRegistered,redirectUri));
         }
@@ -119,6 +132,16 @@ namespace rest_api.Controllers
                             "bearer"
                             );
         }
+        private string GenerateErrorRedirect(UserFacebook externalLogin, string message, string redirectUri)
+        {
+            return string.Format("{0}?email={1}&provider={2}&err={3}",
+                            redirectUri,
+                            externalLogin.Email,
+                            externalLogin.LoginProvider,
+                            message
+                            );
+        }
+
         private string ValidateClientAndRedirectUri(HttpRequestMessage request, ref string redirectUriOutput)
         {
 

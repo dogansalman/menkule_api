@@ -1,5 +1,7 @@
 ﻿using System.Data.Entity;
 using rest_api.Models;
+using rest_api.Libary.Exceptions.ValidationException;
+using System.Data.Entity.Validation;
 
 namespace rest_api.Context
 {
@@ -8,7 +10,6 @@ namespace rest_api.Context
         public DatabaseContext() : base("Name=ConnectionStr")
         {
             Database.SetInitializer<DatabaseContext>(null);
-
         }
         public DbSet<Advert> advert { get; set; }
         public DbSet<AdvertImages> advert_images { get; set; }
@@ -62,5 +63,19 @@ namespace rest_api.Context
 
 
         }
+
+        public override int SaveChanges()
+        {
+            try
+            {
+                return base.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                var newException = new ValidationException(e);
+                throw newException;
+            }
+        }
+
     }
 }

@@ -3,7 +3,8 @@ using System.Linq;
 using System.Web.Http;
 using rest_api.Models;
 using rest_api.Context;
-using rest_api.Libary.Exceptions;
+using rest_api.Libary.Exceptions.ExceptionThrow;
+
 
 namespace rest_api.Controllers
 {
@@ -24,7 +25,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok();
         }

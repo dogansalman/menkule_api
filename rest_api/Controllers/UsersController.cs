@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Security.Claims;
 using System.Web;
 using System.Web.Http.Description;
 using System.Web.UI.WebControls;
@@ -12,13 +11,12 @@ using System.Net.Http;
 using rest_api.Models;
 using rest_api.Context;
 using rest_api.ModelViews;
-using rest_api.Libary.Exceptions;
-using rest_api.Libary.Responser;
+using rest_api.Libary.Exceptions.ExceptionThrow;
 using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
-using Newtonsoft.Json;
+
 
 namespace rest_api.Controllers
 {
@@ -39,8 +37,8 @@ namespace rest_api.Controllers
         {
             //validation
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.BadRequest, "e-posta adresi kullanılmaktadır.");
-            if (db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.BadRequest, "gsm no kullanılmaktadır.");
+            if (db.users.Any(u => u.email == user.email)) ExceptionThrow.Throw("e-posta adresi kullanılmaktadır.", HttpStatusCode.BadRequest);
+            if (db.users.Any(u => u.gsm == user.gsm)) ExceptionThrow.Throw("gsm no kullanılmaktadır.", HttpStatusCode.BadRequest);
 
             //generate activation code
             Random rnd = new Random();
@@ -83,8 +81,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
-                //ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
 
             //Send Gsm Activation Code
@@ -121,8 +118,7 @@ namespace rest_api.Controllers
         public IHttpActionResult get()
         {
 
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             var user = db.users.GroupJoin(
                  db.images,
                  u => u.image_id,
@@ -168,14 +164,11 @@ namespace rest_api.Controllers
         [Authorize]
         public IHttpActionResult update([FromBody] Users user)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
-
-
+            int user_id = Users.GetUserId(User);
             Users dbUser = db.users.Find(user_id);
             if (dbUser == null) return NotFound();
-            if (dbUser.email != user.email && db.users.Any(u => u.email == user.email)) Responser.Response(HttpStatusCode.BadRequest, "e-posta adresi kullanılmaktadır.");
-            if (dbUser.gsm != user.gsm && db.users.Any(u => u.gsm == user.gsm)) Responser.Response(HttpStatusCode.BadRequest, "gsm no kullanılmaktadır.");
+            if (dbUser.email != user.email && db.users.Any(u => u.email == user.email)) ExceptionThrow.Throw("e-posta adresi kullanılmaktadır.", HttpStatusCode.BadRequest);
+            if (dbUser.gsm != user.gsm && db.users.Any(u => u.gsm == user.gsm)) ExceptionThrow.Throw("gsm no kullanılmaktadır.", HttpStatusCode.BadRequest);
 
             if (dbUser.gsm != user.gsm)
             {
@@ -206,7 +199,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok(new {
                 name = user.name,
@@ -235,8 +228,7 @@ namespace rest_api.Controllers
         {
             if (password.password != password.reply) return BadRequest();
 
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             string pas = Bcrypt.hash(password.currentpassword);
 
             Users user = db.users.Where(u => u.id == user_id && u.password == pas).FirstOrDefault();
@@ -247,9 +239,9 @@ namespace rest_api.Controllers
             {
                 db.SaveChanges();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok();
         }
@@ -276,7 +268,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
 
             Mailgun.Send("forgot_password", new Dictionary<string, object>() { { "fullname", user.name + " " + user.lastname }, { "token", token } }, user.email, "Menkule Şifre Yenileme Talebiniz");
@@ -310,7 +302,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
 
             return Ok();
@@ -345,10 +337,9 @@ namespace rest_api.Controllers
         [Route("validate/gsm")]
         public IHttpActionResult gsm()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
-            if (!db.users.Any(u => u.gsm_state == true && u.id == user_id)) Responser.Response(HttpStatusCode.Forbidden, "Gsm not approved");
+            if (!db.users.Any(u => u.gsm_state == true && u.id == user_id)) ExceptionThrow.Throw("Gsm no onaylanmadı.", HttpStatusCode.Forbidden);
             return Ok();
         }
 
@@ -358,10 +349,9 @@ namespace rest_api.Controllers
         [Route("validate/mail")]
         public IHttpActionResult mail()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
-            if (!db.users.Any(u => u.email_state == true && u.id == user_id)) Responser.Response(HttpStatusCode.Forbidden, "E-mail not approved");
+            if (!db.users.Any(u => u.email_state == true && u.id == user_id)) ExceptionThrow.Throw("E-posta adresi onaylanmadı.", HttpStatusCode.Forbidden);
             return Ok();
         }
 
@@ -371,8 +361,7 @@ namespace rest_api.Controllers
         [Route("validate/gsm/send")]
         public IHttpActionResult resendGsmCode()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Users user = db.users.Where(u => u.id == user_id).FirstOrDefault();
             if (user == null) return NotFound();
@@ -380,7 +369,7 @@ namespace rest_api.Controllers
             if (user.gsm_last_update != null)
             {
                 TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.gsm_last_update);
-                if (diff.TotalMinutes <= 4) Responser.Response(HttpStatusCode.Forbidden, "Yeni aktivasyon kodu için 4 dakika beklemeniz gerekmektedir.");
+                if (diff.TotalMinutes <= 4) ExceptionThrow.Throw("Yeni aktivasyon kodu için 4 dakika beklemeniz gerekmektedir.", HttpStatusCode.Forbidden);
             }
 
             //generate activation code
@@ -395,7 +384,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
 
             //Send Gsm Activation Code
@@ -414,8 +403,7 @@ namespace rest_api.Controllers
         [Route("approve/ownership")]
         public IHttpActionResult ownerApprove()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Users user = db.users.Find(user_id);
             if (user == null) return NotFound();
@@ -424,24 +412,10 @@ namespace rest_api.Controllers
             {
                 db.SaveChanges();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                ExceptionHandler.Handle(e);
+                ExceptionThrow.Throw(e);
             }
-
-            /*
-                //claimsIdentity.RemoveClaim(new Claim(ClaimTypes.Role, "owner"));
-                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, "owner"));
-                Microsoft.Owin.IOwinContext context = HttpContext.Current.GetOwinContext();
-                context.Authentication.SignOut();
-                context.Authentication.SignIn(claimsIdentity);
-                //var authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
-                //authenticationManager.AuthenticationResponseGrant = new AuthenticationResponseGrant(new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties() { IsPersistent = true });
-                 var roles = ((ClaimsIdentity)User.Identity).Claims
-                .Where(c => c.Type == ClaimTypes.Role)
-                .Select(c => c.Value);
-             */
-
 
             return Ok();
         }
@@ -452,8 +426,7 @@ namespace rest_api.Controllers
         [Route("approve/gsm")]
         public IHttpActionResult approveGsm([FromBody] _Code userApproved)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Users user = db.users.Where(u => u.id == user_id && u.gsm_activation_code == userApproved.code).FirstOrDefault();
             if (user == null) return NotFound();
@@ -463,9 +436,9 @@ namespace rest_api.Controllers
             {
                 db.SaveChanges();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                ExceptionHandler.Handle(e);
+                ExceptionThrow.Throw(e);
             }
             return Ok();
         }
@@ -477,8 +450,7 @@ namespace rest_api.Controllers
         [Route("approve/mail")]
         public IHttpActionResult approveMail([FromBody] _Code userApproved)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Users user = db.users.Where(u => u.id == user_id && u.email_activation_code == userApproved.code).FirstOrDefault();
             if (user == null) return NotFound();
@@ -487,9 +459,9 @@ namespace rest_api.Controllers
             {
                 //db.SaveChanges();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                ExceptionHandler.Handle(e);
+                ExceptionThrow.Throw(e);
             }
             return Ok();
         }
@@ -504,8 +476,7 @@ namespace rest_api.Controllers
         [ResponseType(typeof(FileUpload))]
         public  IHttpActionResult upload()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             Users user = db.users.Find(user_id);
 
             var httpRequest = HttpContext.Current.Request;
@@ -515,7 +486,10 @@ namespace rest_api.Controllers
 
             Images userImage = Cloudinary.upload(image, "users/" + user.name + "-" + user.lastname + "-" + user.id);
             if (userImage == null) return BadRequest();
-           
+
+            db.images.Add(userImage);
+            db.SaveChanges();
+
             user.image_id = userImage.id;
             db.SaveChanges();
 

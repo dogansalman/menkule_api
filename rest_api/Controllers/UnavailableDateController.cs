@@ -18,8 +18,7 @@ namespace rest_api.Controllers
         [Authorize(Roles = "owner")]
         public IHttpActionResult setDates([FromBody] ICollection<AdvertUnavailableDate> dates, int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             if (!db.advert.Any(a => a.user_id == user_id && a.id == id)) return NotFound();
 
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(uad => uad.advert_id == id && uad.rezervation_id == 0));

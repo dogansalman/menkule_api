@@ -44,9 +44,11 @@ namespace rest_api.Libary.Cloudinary
 
                     };
                     Dictionary<string, object> dic = JsonHelper.JsonHelper.ConvertJsonToDictionary(cloudinary.Upload(uploadParams).JsonObj.ToString());
-                    //add to database
-                    Images image = new Images();
-                    return image.add(getParam(dic, "public_id") + "." + getParam(dic, "format"));
+                    Images image = new Images()
+                    {
+                        url = getParam(dic, "public_id") + "." + getParam(dic, "format")
+                    };
+                    return image;
                 };
             }
             catch (System.Exception ex)

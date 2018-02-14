@@ -7,6 +7,7 @@ using rest_api.Context;
 using System.Net.Http;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace rest_api.Models
 {
@@ -61,6 +62,13 @@ namespace rest_api.Models
                 JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
             return tokenDictionary;
         }
+
+        public static int GetUserId(System.Security.Principal.IPrincipal User)
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+            return int.Parse(claimsIdentity.FindFirst("user_id").Value);
+        }
+
         [Key]
         public int id { get; set; }
         private string _name;
@@ -91,11 +99,10 @@ namespace rest_api.Models
         }
         [StringLength(255)]
         public string password { get; set; }
-        [Required]
         [PhoneMask("0000000000")]
         [StringLength(11)]
-        [Index("IX_UserGsm", 2, IsUnique = true)]
-        public string gsm { get; set; }
+        [Required(AllowEmptyStrings = true)]
+        public string gsm { get; set; } 
         public int? image_id { get; set; }
         public bool email_state { get; set; } = true;
         public bool gsm_state { get; set; } = false;

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Security.Claims;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json;
 using rest_api.ModelViews;
 using rest_api.Context;
 using rest_api.Models;
-using rest_api.Libary.Responser;
 using rest_api.Libary.Socket;
+using rest_api.Libary.Exceptions.ExceptionThrow;
 
 namespace rest_api.Controllers
 {
@@ -28,8 +27,8 @@ namespace rest_api.Controllers
         public IHttpActionResult create([FromBody] _Message _message)
         {
             #region User Validation
-            var identity = User.Identity as ClaimsIdentity;
-            int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
+
+            int user_id = Users.GetUserId(User);
 
             // get User
             Users user = db.users.Find(user_id);
@@ -39,7 +38,8 @@ namespace rest_api.Controllers
             if (!db.users.Any(u => u.id == _message.user_id)) return NotFound();
             #endregion
 
-            if (user_id == _message.user_id) Responser.Response(System.Net.HttpStatusCode.Forbidden, "Geçersiz mesaj istediği.");
+            if (user_id == _message.user_id) ExceptionThrow.Throw("Geçersiz mesaj istediği.", System.Net.HttpStatusCode.Forbidden);
+
 
             List<_MessageDetail> msgList = new List<_MessageDetail>();
             _MessageDetail msgDetail = new _MessageDetail()
@@ -87,8 +87,8 @@ namespace rest_api.Controllers
         [Route("")]
         public object gets()
         {
-            var identity = User.Identity as ClaimsIdentity;
-            int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
+           
+            int user_id = Users.GetUserId(User);
             return (
                 from m in db.messages
                 join um in db.user_messages on m.id equals um.message_id
@@ -108,8 +108,7 @@ namespace rest_api.Controllers
        [Route("{id}")]
        public object get(int id)
         {
-            var identity = User.Identity as ClaimsIdentity;
-            int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             UserMessages userMessage = db.user_messages.Where(um => um.message_id == id && um.user_id == user_id).FirstOrDefault();
             if (userMessage == null) return NotFound();
@@ -138,8 +137,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult reply([FromBody] _ReplyMessage replyMessage, int id)
         {
-            var identity = User.Identity as ClaimsIdentity;
-            int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Users user = db.users.Find(user_id);
             if (user == null) return NotFound();
@@ -183,8 +181,7 @@ namespace rest_api.Controllers
         [Authorize]
         public object getLast(int count)
         {
-            var identity = User.Identity as ClaimsIdentity;
-            int user_id = Int32.Parse(identity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             return (
                 from m in db.messages
                 join um in db.user_messages on m.id equals um.message_id

@@ -1,9 +1,8 @@
 ﻿using System.Web.Http;
 using System.Linq;
-using System.Security.Claims;
 using rest_api.Context;
 using rest_api.Models;
-using rest_api.Libary.Exceptions;
+using rest_api.Libary.Exceptions.ExceptionThrow;
 
 namespace rest_api.Controllers
 {
@@ -18,8 +17,7 @@ namespace rest_api.Controllers
         public IHttpActionResult add([FromBody] AdvertScores advertScore)
         {
 
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             if (!ModelState.IsValid) return BadRequest(ModelState);
             
             if (!db.advert.Any(a => a.id == advertScore.advert_id)) return NotFound();
@@ -31,7 +29,7 @@ namespace rest_api.Controllers
             }
             catch (System.Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok(advertScore);
         }

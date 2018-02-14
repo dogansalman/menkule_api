@@ -2,14 +2,13 @@
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Security.Claims;
 using System.Collections.Generic;
-using rest_api.Libary.Responser;
 using rest_api.ModelViews;
 using rest_api.Context;
 using rest_api.Models;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Mailgun;
+using rest_api.Libary.Exceptions.ExceptionThrow;
 
 namespace rest_api.Controllers
 {
@@ -24,8 +23,7 @@ namespace rest_api.Controllers
         [Route("out")]
         public object getsOut()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
              return (
                  from r in db.rezervations
@@ -60,8 +58,8 @@ namespace rest_api.Controllers
         [Route("in")]
         public object getsIn()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+
+            int user_id = Users.GetUserId(User);
             return (
                  from r in db.rezervations
                  where r.owner == user_id
@@ -99,8 +97,7 @@ namespace rest_api.Controllers
         {
             try
             {
-                var claimsIdentity = User.Identity as ClaimsIdentity;
-                int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+                int user_id = Users.GetUserId(User);
 
                 var rezervation = (
                                from r in db.rezervations
@@ -186,7 +183,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                Responser.Response(HttpStatusCode.NotImplemented, ex.Message.ToString());
+                ExceptionThrow.Throw(ex);
             }
 
             return NotFound();
@@ -202,15 +199,14 @@ namespace rest_api.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             // get user
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             Users user = db.users.Where(u => u.id == user_id && u.state == true).FirstOrDefault();
-            if (user == null) Responser.Response(HttpStatusCode.Forbidden, "Lütfen hesabınızı doğrulayın.");
+            if (user == null) ExceptionThrow.Throw("Lütfen hesabınızı doğrulayın.", HttpStatusCode.Forbidden);
             
             // existence
             Advert advert = db.advert.Where(a => a.state == true && a.id == _rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
-            if (db.rezervations.Any(rez => rez.user_id == user_id && rez.advert_id == _rezervation.advert_id && rez.checkin == _rezervation.checkin && rez.checkout == _rezervation.checkout)) Responser.Response(HttpStatusCode.Forbidden, "Zaten aynı tarih için bir rezervasyon talebiniz bulunmakta.");
+            if (db.rezervations.Any(rez => rez.user_id == user_id && rez.advert_id == _rezervation.advert_id && rez.checkin == _rezervation.checkin && rez.checkout == _rezervation.checkout)) ExceptionThrow.Throw("Zaten aynı tarih için bir rezervasyon talebiniz bulunmakta.", HttpStatusCode.Forbidden);
 
             //get owner
             Users owner = db.users.Where(u => u.id == advert.user_id).FirstOrDefault();
@@ -222,7 +218,7 @@ namespace rest_api.Controllers
             {
                 dateList.Add(date);
             }
-            if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && dateList.Contains(i.fulldate)).Count() > 0 ) Responser.Response(HttpStatusCode.Forbidden, "İlan belirtilen tarih için müsait değil.");
+            if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && dateList.Contains(i.fulldate)).Count() > 0) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
 
             // create rezervation
             Rezervations rezervation = new Rezervations
@@ -301,15 +297,14 @@ namespace rest_api.Controllers
         [Route("approve/{id}")]
         public IHttpActionResult approve(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Rezervations rezervation = db.rezervations.Find(id);
             if (rezervation == null) return NotFound();
-            if(rezervation.updated_date != null) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
+            if(rezervation.updated_date != null)  ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
             RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
-            if (advert.user_id != user_id) Responser.Response(HttpStatusCode.Forbidden, "Yetkisiz işlem gerçekleştirildi!");
+            if (advert.user_id != user_id) ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
 
             Users user = db.users.Find(rezervation.user_id);
             if (user == null) return NotFound();
@@ -357,12 +352,11 @@ namespace rest_api.Controllers
         [Authorize]
         public IHttpActionResult cancel(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
 
             Rezervations rezervation = db.rezervations.Find(id);
             if (rezervation == null) return NotFound();
-            if (rezervation.is_cancel) Responser.Response(HttpStatusCode.Forbidden, "Rezervasyon daha önce iptal edilmiş!");
+            if (rezervation.is_cancel) ExceptionThrow.Throw("Rezervasyon daha önce iptal edilmiş.", HttpStatusCode.Forbidden);
 
             RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
@@ -390,7 +384,7 @@ namespace rest_api.Controllers
                 DateTime lastCanceleableDate = rezervation.checkin.AddDays(-advert.cancel_time);
                 DateTime EndDate = DateTime.Now;
                 int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
-                if (!(dateDiff <= 0 || is_cancel ? false : true)) Responser.Response(HttpStatusCode.Forbidden, "Bu rezervasyon iptal süresi dışındadır!");
+                if (!(dateDiff <= 0 || is_cancel ? false : true)) ExceptionThrow.Throw("Bu rezervasyon iptal süresi dışındadır.", HttpStatusCode.Forbidden);
                 db.SaveChanges();
 
                 Users advert_owner = db.users.Find(rezervation.owner);

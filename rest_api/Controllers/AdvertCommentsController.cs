@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Web.Http;
-using System.Security.Claims;
 using rest_api.Models;
 using rest_api.Context;
-using rest_api.Libary.Exceptions;
-using rest_api.ModelViews;
+using rest_api.Libary.Exceptions.ExceptionThrow;
+
 
 namespace rest_api.Controllers
 {
@@ -20,8 +19,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult read(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             AdvertComments comment = db.advert_comments.Where(ac => ac.id == id).FirstOrDefault();
             if (comment == null) return NotFound();
             return Ok(comment);
@@ -34,8 +32,8 @@ namespace rest_api.Controllers
         [Route("")]
         public object gets()
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            
+            int user_id = Users.GetUserId(User);
             return from c in db.advert_comments
                    from aimg in db.advert_images
                    where aimg.is_default == true && aimg.advert_id == c.advert_id
@@ -52,8 +50,7 @@ namespace rest_api.Controllers
         [Route("")]
         public IHttpActionResult add([FromBody] AdvertComments advertComments)
         {
-            var claimsIdendity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdendity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             Users user = db.users.Find(user_id);
 
             
@@ -69,7 +66,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok(advertComments);
         }
@@ -80,8 +77,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult update([FromBody] AdvertComments advertComments, int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             if (!ModelState.IsValid) return BadRequest(ModelState);
             if (!db.advert_comments.Any(ac => ac.advert_id == advertComments.advert_id && ac.id == id && ac.user_id == user_id)) return NotFound();
 
@@ -97,7 +93,7 @@ namespace rest_api.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ExceptionHandler.Handle(ex);
+                    ExceptionThrow.Throw(ex);
                 }
             }
             return Ok(advertComments);
@@ -109,8 +105,7 @@ namespace rest_api.Controllers
         [Route("{id}")]
         public IHttpActionResult delete(int id)
         {
-            var claimsIdentity = User.Identity as ClaimsIdentity;
-            int user_id = int.Parse(claimsIdentity.FindFirst("user_id").Value);
+            int user_id = Users.GetUserId(User);
             AdvertComments comment = db.advert_comments.Where(ac => ac.id == id).FirstOrDefault();
             if (comment == null) return NotFound();
             db.advert_comments.Remove(comment);
@@ -120,7 +115,7 @@ namespace rest_api.Controllers
             }
             catch (Exception ex)
             {
-                ExceptionHandler.Handle(ex);
+                ExceptionThrow.Throw(ex);
             }
             return Ok();
 
