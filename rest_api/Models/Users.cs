@@ -105,6 +105,7 @@ namespace rest_api.Models
         public string gsm { get; set; } 
         public int? image_id { get; set; }
         public bool email_state { get; set; } = true;
+        public bool is_external_confirm { get; set; } = true;
         public bool gsm_state { get; set; } = false;
         [StringLength(255)]
         public string email_activation_code { get; set; }

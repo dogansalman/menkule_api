@@ -135,6 +135,7 @@ namespace rest_api.Controllers
                      email = u.user.email,
                      gsm = u.user.gsm,
                      gender = u.user.gender,
+                     is_external_confirm = u.user.is_external_confirm,
                      photo = i.url,
                      identity_no = u.user.identity_no,
                      ownershiping = u.user.ownershiping,

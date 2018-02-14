@@ -10,8 +10,9 @@ namespace rest_api.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = true;
+            
         }
 
         DatabaseContext db = new DatabaseContext();

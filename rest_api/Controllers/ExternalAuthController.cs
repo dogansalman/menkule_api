@@ -79,7 +79,8 @@ namespace rest_api.Controllers
                         password = Bcrypt.hash(password),
                         source = "facebook",
                         email_activation_code = "",
-                        gsm_activation_code = ""
+                        gsm_activation_code = "",
+                        is_external_confirm = false
                     };
                     db.users.Add(userData);
                     
