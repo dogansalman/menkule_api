@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using System.Web.Http.Description;
 using rest_api.Context;
 using rest_api.Models;
+using rest_api.ModelViews;
 using rest_api.Libary.Exceptions.ExceptionThrow;
 using rest_api.Libary.Cloudinary;
 using rest_api.OAuth.CustomAttributes.Owner;
@@ -142,6 +143,21 @@ namespace rest_api.Controllers
             db.advert.Add(advert);
             db.SaveChanges();
 
+            // Advert Images Validation
+            var imagesList = advert.images.ToList();
+            if (imagesList.FindAll(img => img.is_default && !img.deleted).Count == 0) ExceptionThrow.Throw("Varsayılan fotoğraf seçin.", System.Net.HttpStatusCode.BadRequest);
+            if (imagesList.FindAll(img => !img.deleted).Count < 3) ExceptionThrow.Throw("En az 3 fotoğraf yüklemelisiniz.", System.Net.HttpStatusCode.BadRequest);
+            if (imagesList.FindAll(img => img.is_default).Count > 1) ExceptionThrow.Throw("En fazla 1 fotoğraf varsayılan olarak seçilebilir.", System.Net.HttpStatusCode.BadRequest);
+
+            List <_AdvertImages> selectedImages = advert.images.ToList().FindAll(i => i.is_default == true);
+            if (selectedImages.Count == 0) advert.images.ToList()[0].is_default = true;
+            
+            if(selectedImages.Count > 1)
+            {
+                advert.images.ToList().ForEach(i => i.is_default = false);
+                advert.images.ToList()[0].is_default = true;
+            }
+            
             // Images
             advert.images.ToList().ForEach(i => {
                 if (i.is_new)
@@ -155,6 +171,7 @@ namespace rest_api.Controllers
                     db.advert_images.Add(ai);
                 }
             });
+            
 
             //Possibility
             advert.possibility.advert_id = advert.id;
@@ -263,8 +280,15 @@ namespace rest_api.Controllers
             db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(ud => ud.advert_id == id));
 
+
+            // Advert Images Validation
+            var imagesList = advert.images.ToList();
+            if (imagesList.FindAll(img => img.is_default && !img.deleted).Count == 0) ExceptionThrow.Throw("Varsayılan fotoğraf seçin.", System.Net.HttpStatusCode.BadRequest);
+            if (imagesList.FindAll(img => !img.deleted).Count < 3) ExceptionThrow.Throw("En az 3 fotoğraf yüklemelisiniz.", System.Net.HttpStatusCode.BadRequest);
+            if (imagesList.FindAll(img => img.is_default).Count > 1) ExceptionThrow.Throw("En fazla 1 fotoğraf varsayılan olarak seçilebilir.", System.Net.HttpStatusCode.BadRequest);
+
             //Images
-            advert.images.ToList().ForEach(i => {
+            imagesList.ForEach(i => {
                 if (i.is_new && !db.advert_images.Any(ai => ai.advert_id == id && ai.image_id == i.id))
                 {
                     AdvertImages ai = new AdvertImages()
@@ -390,7 +414,6 @@ namespace rest_api.Controllers
 
                 return BadRequest(ex.Message.ToString());
             }
-          
         }
 
         //Search Find
