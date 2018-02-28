@@ -65,8 +65,14 @@ namespace rest_api.Controllers
 
                     string password = Users.generatePassword(5, 3);
 
+                    //generate activation code
+                    Random rnd = new Random();
+                    string gsm_code = rnd.Next(9999, 999999).ToString();
+                    string email_code = rnd.Next(9999, 999999).ToString();
+
                     // disable db validations
                     db.Configuration.ValidateOnSaveEnabled = false;
+
                     // create user 
                     Users userData = new Users
                     {
@@ -78,14 +84,13 @@ namespace rest_api.Controllers
                         gsm = string.Empty,
                         password = Bcrypt.hash(password),
                         source = "facebook",
-                        email_activation_code = "",
-                        gsm_activation_code = "",
-                        is_external_confirm = false
+                        email_activation_code = email_code,
+                        gsm_activation_code = gsm_code,
+                        is_external_confirm = false,
+
                     };
                     db.users.Add(userData);
                     
-                
-
                     // save photos
                     byte[] imageData = null;
                     using (var wc = new System.Net.WebClient())

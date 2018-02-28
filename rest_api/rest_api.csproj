@@ -268,6 +268,7 @@
     <Compile Include="ModelViews\_AdvertAvaiableDates.cs" />
     <Compile Include="ModelViews\_AdvertImages.cs" />
     <Compile Include="ModelViews\_Contact.cs" />
+    <Compile Include="ModelViews\_ExternalConfirm.cs" />
     <Compile Include="ModelViews\_LatitudeLongitude.cs" />
     <Compile Include="ModelViews\_Message.cs" />
     <Compile Include="ModelViews\_Rezervation.cs" />

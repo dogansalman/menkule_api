@@ -327,6 +327,41 @@ namespace rest_api.Controllers
             return Ok();
         }
 
+        //External Auth Confirm Password & Gsm
+        [HttpPut]
+        [Authorize]
+        [Route("external/confirm")]
+        public IHttpActionResult externalConfirm([FromBody] _ExternalConfirm externalConfirmData)
+        {
+            int user_id = Users.GetUserId(User);
+
+            if (externalConfirmData.password != externalConfirmData.reply) ExceptionThrow.Throw("Şifre tekrarı hatalı.", HttpStatusCode.BadRequest);
+
+            if (db.users.Any(u => u.gsm == externalConfirmData.gsm)) ExceptionThrow.Throw("gsm no kullanılmaktadır.", HttpStatusCode.BadRequest);
+
+            Users user = db.users.Where(u => u.id == user_id && u.is_external_confirm == false).FirstOrDefault();
+
+            if (user == null) ExceptionThrow.Throw("Zaten şifre güncellenmiş", HttpStatusCode.Forbidden);
+
+            user.gsm = externalConfirmData.gsm;
+            user.updated_date = DateTime.Now;
+            user.password = Bcrypt.hash(externalConfirmData.password);
+            user.is_external_confirm = true;
+
+            try
+            {
+                db.SaveChanges();
+
+                //Send Gsm Activation Code
+                NetGsm.Send(externalConfirmData.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + user.gsm_activation_code);
+            }
+            catch (Exception ex)
+            {
+                ExceptionThrow.Throw(ex);
+            }
+            return Ok();
+        }
+
 
         /*
          User Gsm Email Validations Function
