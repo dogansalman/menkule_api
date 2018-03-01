@@ -145,6 +145,7 @@ namespace rest_api.Controllers
 
             // Advert Images Validation
             var imagesList = advert.images.ToList();
+            if (imagesList.FindAll(img => !img.deleted).Count == 20) ExceptionThrow.Throw("Maksimum fotoğraf limitini aştınız.", System.Net.HttpStatusCode.BadRequest);
             if (imagesList.FindAll(img => img.is_default && !img.deleted).Count == 0) ExceptionThrow.Throw("Varsayılan fotoğraf seçin.", System.Net.HttpStatusCode.BadRequest);
             if (imagesList.FindAll(img => !img.deleted).Count < 3) ExceptionThrow.Throw("En az 3 fotoğraf yüklemelisiniz.", System.Net.HttpStatusCode.BadRequest);
             if (imagesList.FindAll(img => img.is_default).Count > 1) ExceptionThrow.Throw("En fazla 1 fotoğraf varsayılan olarak seçilebilir.", System.Net.HttpStatusCode.BadRequest);
@@ -283,6 +284,7 @@ namespace rest_api.Controllers
 
             // Advert Images Validation
             var imagesList = advert.images.ToList();
+            if (imagesList.FindAll(img => !img.deleted).Count == 20) ExceptionThrow.Throw("Maksimum fotoğraf limitini aştınız.", System.Net.HttpStatusCode.BadRequest);
             if (imagesList.FindAll(img => img.is_default && !img.deleted).Count == 0) ExceptionThrow.Throw("Varsayılan fotoğraf seçin.", System.Net.HttpStatusCode.BadRequest);
             if (imagesList.FindAll(img => !img.deleted).Count < 3) ExceptionThrow.Throw("En az 3 fotoğraf yüklemelisiniz.", System.Net.HttpStatusCode.BadRequest);
             if (imagesList.FindAll(img => img.is_default).Count > 1) ExceptionThrow.Throw("En fazla 1 fotoğraf varsayılan olarak seçilebilir.", System.Net.HttpStatusCode.BadRequest);
