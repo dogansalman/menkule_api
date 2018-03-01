@@ -184,7 +184,7 @@ namespace rest_api.Controllers
                 //send gsm activation code
                 NetGsm.Send(user.gsm, "menkule.com.tr uyeliginiz ile ilgili onay kodunuz: " + gsm_code);
             }
-
+            dbUser.identity_no = user.identity_no;
             dbUser.gsm = user.gsm;
             dbUser.email = user.email;
             dbUser.name = user.name;
