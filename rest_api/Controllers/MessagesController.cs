@@ -175,6 +175,19 @@ namespace rest_api.Controllers
         }
 
 
+        [HttpDelete]
+        [Authorize]
+        [Route("{id}")]
+        public IHttpActionResult delete(int id)
+        {
+            int user_id = Users.GetUserId(User);
+            UserMessages userMessage = db.user_messages.Where(um => um.user_id == user_id && um.message_id == id).FirstOrDefault();
+            if (userMessage == null) return NotFound();
+            userMessage.is_deleted = true;
+            db.SaveChanges();
+            return Ok();
+        }
+
         // New Last 10 Gets
         [HttpGet]
         [Route("last/{count}")]
