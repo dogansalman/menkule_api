@@ -2,6 +2,7 @@
 using System.Web.Http;
 using rest_api.Context;
 using rest_api.ModelViews;
+using System;
 
 namespace rest_api.Controllers
 {
@@ -15,8 +16,15 @@ namespace rest_api.Controllers
         [Route("")]
         public object find([FromBody] _LatitudeLongitude cordinates)
         {
+            
+
+            double lat_max = Convert.ToDouble(cordinates.lat.ToString().Split('-')[0].Replace('.',','));
+            double lat_min = Convert.ToDouble(cordinates.lat.ToString().Split('-')[1].Replace('.', ','));
+            double lng_max = Convert.ToDouble(cordinates.lng.ToString().Split('-')[0].Replace('.', ','));
+            double lng_min = Convert.ToDouble(cordinates.lng.ToString().Split('-')[1].Replace('.', ','));
+
             return (from a in db.advert
-                    where a.latitude <= cordinates.lat && a.longitude >= cordinates.lng
+                    where (a.latitude <= lat_max & a.longitude <= lng_max) & (a.latitude >= lat_min & a.longitude >= lng_min)
                     join c in db.cities on a.city_id equals c.id
                     join t in db.towns on a.town_id equals t.id
                     join p in db.advert_properties on a.id equals p.advert_id
@@ -26,7 +34,8 @@ namespace rest_api.Controllers
                     join uimg in db.images on u.image_id equals uimg.id into j1
                     from j2 in j1.DefaultIfEmpty()
                     where a.state == true
-                    select new {
+                    select new
+                    {
                         id = a.id,
                         adress = a.adress,
                         title = a.title,
@@ -46,7 +55,7 @@ namespace rest_api.Controllers
                             from aimg in db.advert_images
                             where aimg.is_default == true && aimg.advert_id == ad.id
                             join img in db.images on aimg.image_id equals img.id
-                            select new {image = img}
+                            select new { image = img }
                             ).FirstOrDefault(),
                         city = c,
                         town = t,
