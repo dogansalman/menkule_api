@@ -10,7 +10,7 @@ namespace rest_api.Libary.Exceptions.ExceptionThrow
     {
         public static void Throw(Exception e = null, HttpStatusCode code = HttpStatusCode.NotImplemented, string message = null)
         {
-            if(e != null)
+            if (e != null)
             {
                 while (e.InnerException != null) e = e.InnerException;
                 if (e.GetType() == typeof(SqlException))
@@ -21,9 +21,7 @@ namespace rest_api.Libary.Exceptions.ExceptionThrow
                 }
 
                 throw new HttpResponseException(new HttpResponseMessage(code) { Content = new StringContent("{\"Message\":\"" + e.Message.ToString() + "\"}", System.Text.Encoding.UTF8, "application/json") });
-            }
-           
-           
+            }  
         }
 
         public static void Throw(string message, HttpStatusCode code = HttpStatusCode.NotImplemented)
