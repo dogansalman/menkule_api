@@ -17,7 +17,7 @@ namespace rest_api.OAuth.CustomAttributes.Owner
 
             if (HttpContext.Current.User == null || HttpContext.Current.User.Identity == null)
             {
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Forbidden, "User not is authenticated");
+                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Lütfen oturum açın.");
             }
 
             var claimsIdentity = HttpContext.Current.User.Identity as ClaimsIdentity;
@@ -25,7 +25,7 @@ namespace rest_api.OAuth.CustomAttributes.Owner
             using (var db = new DatabaseContext())
             {
                 if (!db.users.Any(u => u.id == user_id && u.ownershiping == true))
-                    actionContext.Response =  actionContext.Request.CreateErrorResponse(HttpStatusCode.Forbidden, "User has not ownershiping");
+                    actionContext.Response =  actionContext.Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Ev sahipliğinizi onaylayın.");
             }
         }
 
