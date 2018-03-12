@@ -9,6 +9,8 @@ using rest_api.Models;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.Exceptions.ExceptionThrow;
+using rest_api.OAuth.CustomAttributes.Owner;
+using rest_api.OAuth.CustomAttributes.Activated;
 
 namespace rest_api.Controllers
 {
@@ -179,6 +181,14 @@ namespace rest_api.Controllers
                     int dateDiff = Convert.ToInt32(lastCanceleableDate.Subtract(EndDate).TotalDays) + 1;
                     rezervation.is_cancelable = dateDiff <= 0 || rezervation.is_cancel ? false : true;
                 }
+
+                // set state notification
+                Notifications notifiy = db.notifications.Where(n => n.user_id == user_id & n.rezervation_id == id).FirstOrDefault();
+                if(notifiy != null)
+                {
+                    notifiy.state = false;
+                    db.SaveChanges();
+                }
                 return rezervation;
             }
             catch (Exception ex)
@@ -193,6 +203,7 @@ namespace rest_api.Controllers
         [HttpPost]
         [Authorize]
         [Route("")]
+        [Activated]
         public IHttpActionResult add([FromBody] _Rezervation _rezervation)
         {
 
@@ -279,7 +290,7 @@ namespace rest_api.Controllers
 
             // send notifications
             Notifications notify = new Notifications();
-            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınz için " + rezervation.days + " günlük rezervasyon talebi!");
+            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınz için " + rezervation.days + " günlük rezervasyon talebi!", rezervation.id);
 
             // send sms
             NetGsm.Send(owner.gsm, "#" + advert.id + " nolu ilaniniz icin toplam " + rezervation.days + " günlük (" + rezervation.total_price + " TL) rezervasyon talebi oluşturuldu. - Menkule.com.tr");
@@ -293,7 +304,7 @@ namespace rest_api.Controllers
 
         //Approved
         [HttpGet]
-        [Authorize(Roles = "owner")]
+        [Owner]
         [Route("approve/{id}")]
         public IHttpActionResult approve(int id)
         {
@@ -301,9 +312,12 @@ namespace rest_api.Controllers
 
             Rezervations rezervation = db.rezervations.Find(id);
             if (rezervation == null) return NotFound();
+
             if(rezervation.updated_date != null)  ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
+
             RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
+
             if (advert.user_id != user_id) ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
 
             Users user = db.users.Find(rezervation.user_id);
@@ -341,6 +355,10 @@ namespace rest_api.Controllers
 
             //Send sms
             NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz onaylandı. - Menkule.com.tr");
+
+            // send notifications
+            Notifications notify = new Notifications();
+            notify.add(user.id, "#" + rezervation.id + " nolu rezervasyon talebiniz onaylandı.", rezervation.id);
 
 
             return Ok();

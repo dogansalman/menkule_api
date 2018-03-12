@@ -278,6 +278,7 @@
     <Compile Include="ModelViews\_Mail.cs" />
     <Compile Include="ModelViews\_UserPassword.cs" />
     <Compile Include="OAuth\AuthBackdoor\AuthBackdoor.cs" />
+    <Compile Include="OAuth\CustomAttributes\Activated\Activated.cs" />
     <Compile Include="OAuth\CustomAttributes\Owner\Owner.cs" />
     <Compile Include="OAuth\FacebookResults\ChallengeResult.cs" />
     <Compile Include="OAuth\Provider\FacebookAuthProvider.cs" />

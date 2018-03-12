@@ -7,7 +7,7 @@ namespace rest_api.Models
 {
     public class Notifications
     {
-        public  void add(int user_id, string title)
+        public  void add(int user_id, string title, int rezervation = 0)
         {
             using (var db = new DatabaseContext())
             {
@@ -16,6 +16,7 @@ namespace rest_api.Models
                     user_id = user_id,
                     title = title,
                     created_date = DateTime.Now,
+                    rezervation_id = rezervation == 0  ? 0 : rezervation,
                     state = true
                 };
                 db.notifications.Add(notify);
@@ -30,8 +31,10 @@ namespace rest_api.Models
         [StringLength(255)]
         public string title { get; set; }
         public bool state { get; set; } = true;
+        public int? rezervation_id { get; set; } = 0;
         public DateTime created_date { get; set; } = DateTime.Now;
         public DateTime? updated_date { get; set; }
+      
 
     }
 

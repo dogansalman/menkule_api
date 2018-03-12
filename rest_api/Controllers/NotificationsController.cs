@@ -62,5 +62,23 @@ namespace rest_api.Controllers
             return db.notifications.Where(n => n.user_id == user_id && n.state == true).OrderByDescending(n => n.created_date).Take(count).ToList();
         }
 
+        [HttpPut]
+        [Route("{id}")]
+        [Authorize]
+        public IHttpActionResult read(int id)
+        {
+            int user_id = Users.GetUserId(User);
+            Notifications notify = db.notifications.Where(n => n.user_id == user_id && n.id == id).FirstOrDefault();
+            if(notify != null)
+            {
+                notify.state = false;
+                notify.updated_date = DateTime.Now;
+                db.SaveChanges();
+            }
+            return Ok();
+        }
+
+
+
     }
 }
