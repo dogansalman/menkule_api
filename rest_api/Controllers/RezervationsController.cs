@@ -219,6 +219,12 @@ namespace rest_api.Controllers
             if (advert == null) return NotFound();
             if (db.rezervations.Any(rez => rez.user_id == user_id && rez.advert_id == _rezervation.advert_id && rez.checkin == _rezervation.checkin && rez.checkout == _rezervation.checkout)) ExceptionThrow.Throw("Zaten aynı tarih için bir rezervasyon talebiniz bulunmakta.", HttpStatusCode.Forbidden);
 
+            // visitor validation
+            AdvertProperties properties = db.advert_properties.Where(ap => ap.advert_id == advert.id).FirstOrDefault();
+            if (properties == null) return NotFound();
+
+            if(properties.visitor < _rezervation.visitors.Count) ExceptionThrow.Throw("Bu ilan için en fazla. " + properties.visitor + " misafir kabul edilebilmektedir.", HttpStatusCode.Forbidden);
+
             //get owner
             Users owner = db.users.Where(u => u.id == advert.user_id).FirstOrDefault();
             if (owner == null) return NotFound();
