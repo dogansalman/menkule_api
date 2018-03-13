@@ -32,7 +32,7 @@ namespace rest_api.Models
         public int min_layover { get; set; }
         [Required]
         public int cancel_time { get; set; }
-        [StringLength(1200)]
+        [StringLength(5000)]
         public string description { get; set; }
         [Required]
         public int zoom { get; set; }

@@ -18,11 +18,14 @@ namespace rest_api.Controllers
         {
             int user_id = Users.GetUserId(User);
             if (!ModelState.IsValid) return BadRequest(ModelState);
-
             if (!db.advert.Any(a => a.id == advertFeedbacks.advert_id)) return NotFound();
 
             advertFeedbacks.user_id = user_id;
+
+            if (db.advert_feedbakcs.Where(af => af.advert_id == advertFeedbacks.advert_id & af.user_id == user_id).ToList().Count == 5) ExceptionThrow.Throw("Bir ilan için en fazla 5 kere geri bildirim hakkınız bulunmaktadır.", System.Net.HttpStatusCode.Forbidden);
+
             db.advert_feedbakcs.Add(advertFeedbacks);
+
             try
             {
                 db.SaveChanges();

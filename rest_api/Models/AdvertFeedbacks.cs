@@ -9,12 +9,10 @@ namespace rest_api.Models
         [Key]
         public int id { get; set; }
         [Required]
-        [Index("IX_AdvertFeedBack", 1, IsUnique = true)]
         public int advert_id { get; set; }
         [Required]
         [StringLength(300, ErrorMessage = "Açıklama en fazla 300 karakter olabilir.")]
         public string description { get; set; }
-        [Index("IX_AdvertFeedBack", 2, IsUnique = true)]
         public int user_id { get; set; }
         [Required]
         [StringLength(255)]
