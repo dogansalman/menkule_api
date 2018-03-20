@@ -17,12 +17,15 @@ namespace rest_api.Controllers
         public object find([FromBody] _LatitudeLongitude cordinates)
         {
             
-
-            double lat_max = Convert.ToDouble(cordinates.lat.ToString().Split('-')[0].Replace('.',','));
-            double lat_min = Convert.ToDouble(cordinates.lat.ToString().Split('-')[1].Replace('.', ','));
-            double lng_max = Convert.ToDouble(cordinates.lng.ToString().Split('-')[0].Replace('.', ','));
-            double lng_min = Convert.ToDouble(cordinates.lng.ToString().Split('-')[1].Replace('.', ','));
-
+            /* Polygon'daki işaretlenebilir alan ile 
+             * Google haritalardan gelen viewport alanı tam eşleşmediği için 
+             * Mevcut viewport alanına +- 0.2 ilave ediyoruz.
+             * Yaklaşık aranan alanı yaklaşık 22km genişletiyoruz..
+             */
+            double lat_max = Convert.ToDouble(cordinates.lat.ToString().Split('-')[0].Replace('.',',')) + 0.2;
+            double lat_min = Convert.ToDouble(cordinates.lat.ToString().Split('-')[1].Replace('.', ',')) - 0.2;
+            double lng_max = Convert.ToDouble(cordinates.lng.ToString().Split('-')[0].Replace('.', ',')) + 0.2;
+            double lng_min = Convert.ToDouble(cordinates.lng.ToString().Split('-')[1].Replace('.', ',')) - 0.2;
             return (from a in db.advert
                     where (a.latitude <= lat_max & a.longitude <= lng_max) & (a.latitude >= lat_min & a.longitude >= lng_min)
                     join c in db.cities on a.city_id equals c.id
@@ -39,7 +42,7 @@ namespace rest_api.Controllers
                         id = a.id,
                         adress = a.adress,
                         title = a.title,
-                        latitude = a.latitude,
+                        latitude = a.latitude,  
                         longitude = a.longitude,
                         comment_size = (db.advert_comments.Where(cmt => cmt.advert_id == a.id).Count()),
                         cancel_time = a.cancel_time,

@@ -402,6 +402,8 @@ namespace rest_api.Controllers
             Users user = db.users.Where(u => u.id == user_id).FirstOrDefault();
             if (user == null) return NotFound();
 
+            if (String.IsNullOrEmpty(user.gsm)) ExceptionThrow.Throw("Lütfen geçerli bir gsm numarası kullanın.", HttpStatusCode.BadRequest);
+
             if (user.gsm_last_update != null)
             {
                 TimeSpan diff = DateTime.Now - Convert.ToDateTime(user.gsm_last_update);
