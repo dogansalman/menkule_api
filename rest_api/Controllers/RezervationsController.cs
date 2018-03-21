@@ -237,6 +237,9 @@ namespace rest_api.Controllers
             }
             if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && dateList.Contains(i.fulldate)).Count() > 0) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
 
+            // min layover date validation
+            if((_rezervation.checkout - _rezervation.checkin).TotalDays  < advert.min_layover ) ExceptionThrow.Throw("Bu ilan için en az " + advert.min_layover + " günlük rezervasyon oluşturulabilir.", HttpStatusCode.Forbidden);
+
             // create rezervation
             Rezervations rezervation = new Rezervations
             {
@@ -250,7 +253,8 @@ namespace rest_api.Controllers
                 visitor = _rezervation.visitors.Count,
                 user_id = user.id,
                 day_price = advert.price,
-                owner = advert.user_id
+                owner = advert.user_id,
+                note = _rezervation.note
 
             };
 
