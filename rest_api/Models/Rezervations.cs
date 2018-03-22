@@ -31,7 +31,7 @@ namespace rest_api.Models
         private int _days;
         public int days
         {
-            get { return getDateDiff(checkin, checkout); }
+            get { return getDateDiff(checkin, checkout) -1; }
             set { _days = getDateDiff(checkin, checkout); }
         }
         [Required]
@@ -39,7 +39,7 @@ namespace rest_api.Models
         private decimal _total_price;
         public decimal total_price
         {
-            get { return (getDateDiff(checkin, checkout) * day_price); }
+            get { return ((getDateDiff(checkin, checkout) -1) * day_price); }
             set { _total_price = (getDateDiff(checkin, checkout) * day_price); }
         }
         [Required]

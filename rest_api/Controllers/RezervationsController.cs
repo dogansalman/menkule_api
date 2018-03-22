@@ -189,6 +189,7 @@ namespace rest_api.Controllers
                     notifiy.state = false;
                     db.SaveChanges();
                 }
+                
                 return rezervation;
             }
             catch (Exception ex)
@@ -231,7 +232,7 @@ namespace rest_api.Controllers
 
             // available date validation
             var dateList = new List<DateTime>();
-            for (DateTime date = _rezervation.checkin; date.Date <= _rezervation.checkout.Date; date = date.AddDays(1))
+            for (DateTime date = _rezervation.checkin; date.Date < _rezervation.checkout.Date; date = date.AddDays(1))
             {
                 dateList.Add(date);
             }
@@ -241,6 +242,10 @@ namespace rest_api.Controllers
             if((_rezervation.checkout - _rezervation.checkin).TotalDays  < advert.min_layover ) ExceptionThrow.Throw("Bu ilan için en az " + advert.min_layover + " günlük rezervasyon oluşturulabilir.", HttpStatusCode.Forbidden);
 
             // create rezervation
+            /*
+             * Son gün çıkış yapılacağı ve rezervasyondaki checkout 
+             * tarihinin boşa çıkartmak için son gün tarih aralığından çıkartılır.
+             */
             Rezervations rezervation = new Rezervations
             {
                 advert_id = _rezervation.advert_id,
@@ -300,7 +305,7 @@ namespace rest_api.Controllers
 
             // send notifications
             Notifications notify = new Notifications();
-            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınz için " + rezervation.days + " günlük rezervasyon talebi!", rezervation.id);
+            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınz için " + rezervation.days  + " günlük rezervasyon talebi!", rezervation.id);
 
             // send sms
             NetGsm.Send(owner.gsm, "#" + advert.id + " nolu ilaniniz icin toplam " + rezervation.days + " günlük (" + rezervation.total_price + " TL) rezervasyon talebi oluşturuldu. - Menkule.com.tr");
@@ -339,7 +344,7 @@ namespace rest_api.Controllers
 
             // available date validation
             var dateList = new List<DateTime>();
-            for (DateTime date = rezervation.checkin; date.Date <= rezervation.checkout.Date; date = date.AddDays(1))
+            for (DateTime date = rezervation.checkin; date.Date < rezervation.checkout.Date; date = date.AddDays(1))
             {
                 dateList.Add(date);
             }
