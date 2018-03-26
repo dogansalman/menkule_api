@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Script.Serialization;
 
 namespace rest_api.Libary.Exceptions.ExceptionThrow
 {
@@ -27,6 +28,11 @@ namespace rest_api.Libary.Exceptions.ExceptionThrow
         public static void Throw(string message, HttpStatusCode code = HttpStatusCode.NotImplemented)
         {
             throw new HttpResponseException(new HttpResponseMessage(code) { Content = new StringContent("{\"Message\":\"" + message + "\"}", System.Text.Encoding.UTF8, "application/json") });
+        }
+
+        public static void Throw(object t, HttpStatusCode code = HttpStatusCode.NotImplemented)
+        {
+            throw new HttpResponseException(new HttpResponseMessage(code) { Content = new StringContent(new JavaScriptSerializer().Serialize(t), System.Text.Encoding.UTF8, "application/json") });
         }
     }
 }

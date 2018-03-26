@@ -317,11 +317,11 @@ namespace rest_api.Controllers
 
         }
 
-        //Approved
+        // Approved
         [HttpGet]
         [Owner]
         [Route("approve/{id}")]
-        public IHttpActionResult approve(int id)
+        public object approve(int id)
         {
             int user_id = Users.GetUserId(User);
 
@@ -337,7 +337,11 @@ namespace rest_api.Controllers
 
             Users user = db.users.Find(rezervation.user_id);
             if (user == null) return NotFound();
-            
+
+            // exist rezervation validations
+            var exist_rezervations = db.rezervations.Where(r => r.advert_id == advert.advert_id & r.id != rezervation.id && r.state == false & r.is_cancel == false & r.checkin >= rezervation.checkin & r.checkin <= rezervation.checkout).ToList();
+            if (exist_rezervations != null) ExceptionThrow.Throw(exist_rezervations, HttpStatusCode.NotImplemented);
+
             rezervation.state = true;
             rezervation.is_cancel = false;
             rezervation.updated_date = DateTime.Now;
@@ -364,22 +368,23 @@ namespace rest_api.Controllers
                     };
                     db.advert_unavaiable_dates.Add(advertUnavaiableDate);
                 });
-
-         
+            
             db.SaveChanges();
 
-            //Send sms
+            // send sms
             NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz onaylandı. - Menkule.com.tr");
 
             // send notifications
             Notifications notify = new Notifications();
             notify.add(user.id, "#" + rezervation.id + " nolu rezervasyon talebiniz onaylandı.", rezervation.id);
 
+            // Send email
+            Mailgun.Send("approve", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.lastname) }, { "rezervation_id", rezervation.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days }, { "price", rezervation.total_price + " TL." } }, user.email, "Rezervasyon talebi onaylandı.");
 
             return Ok();
         }
         
-        //Cancel
+        // cancel
         [HttpGet]
         [Route("cancel/{id}")]
         [Authorize]
@@ -406,13 +411,22 @@ namespace rest_api.Controllers
                 if (user == null) return NotFound();
                 db.SaveChanges();
 
+                // Add notify
                 Notifications notify = new Notifications();
-                notify.add(user.id, "#" + rezervation.id + " nolu " + rezervation.days + " günlük rezervasyon talebi iptal edildi!");
+                notify.add(user.id, "#" + rezervation.id + " nolu " + rezervation.days + " günlük rezervasyon talebi iptal edildi!", rezervation.id);
 
-                //Send sms
+                // Send sms
                 NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz iptal edildi. - Menkule.com.tr");
+
+                // Send email
+                Mailgun.Send("cancel", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.lastname) }, { "rezervation_id", rezervation.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days }, { "price", rezervation.total_price + " TL." } }, user.email, "Rezervasyon talebi iptal edildi.");
             }
-            if(user_id == rezervation.user_id)
+            
+
+            // Delete unavaiable dates
+            db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(uad => uad.advert_id == rezervation.advert_id && uad.rezervation_id == id));
+
+            if (user_id == rezervation.user_id)
             {
                 DateTime lastCanceleableDate = rezervation.checkin.AddDays(-advert.cancel_time);
                 DateTime EndDate = DateTime.Now;
@@ -423,10 +437,16 @@ namespace rest_api.Controllers
                 Users advert_owner = db.users.Find(rezervation.owner);
                 if(advert_owner != null)
                 {
-                    //Send sms
+                    // Send sms
                     NetGsm.Send(advert_owner.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyon talebi iptal edildi. - Menkule.com.tr");
+
+                    // Add Notify
                     Notifications notify = new Notifications();
-                    notify.add(advert_owner.id, "#" + rezervation.id + " nolu " + rezervation.days + " günlük rezervasyon talebi iptal edildi!");
+                    notify.add(advert_owner.id, "#" + rezervation.id + " nolu " + rezervation.days + " günlük rezervasyon talebi iptal edildi!", rezervation.id);
+
+                    // Send email
+                    Mailgun.Send("cancel", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(advert_owner.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(advert_owner.lastname) }, { "rezervation_id", rezervation.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days }, { "price", rezervation.total_price + " TL." } }, advert_owner.email, "Rezervasyon talebi iptal edildi.");
+
                 }
                 
             }
