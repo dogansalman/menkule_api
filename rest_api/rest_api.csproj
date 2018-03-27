@@ -265,6 +265,7 @@
     <Compile Include="Models\UserFacebook.cs" />
     <Compile Include="Models\UserMessages.cs" />
     <Compile Include="Models\Users.cs" />
+    <Compile Include="ModelViews\_ExistRezervation.cs" />
     <Compile Include="ModelViews\_AdvertAvaiableDates.cs" />
     <Compile Include="ModelViews\_AdvertImages.cs" />
     <Compile Include="ModelViews\_Contact.cs" />

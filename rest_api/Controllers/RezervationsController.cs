@@ -207,7 +207,6 @@ namespace rest_api.Controllers
         [Activated]
         public IHttpActionResult add([FromBody] _Rezervation _rezervation)
         {
-
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             // get user
@@ -220,32 +219,42 @@ namespace rest_api.Controllers
             if (advert == null) return NotFound();
             if (db.rezervations.Any(rez => rez.user_id == user_id && rez.advert_id == _rezervation.advert_id && rez.checkin == _rezervation.checkin && rez.checkout == _rezervation.checkout)) ExceptionThrow.Throw("Zaten aynı tarih için bir rezervasyon talebiniz bulunmakta.", HttpStatusCode.Forbidden);
 
+            if(user_id == advert.user_id) ExceptionThrow.Throw("Lütfen farklı bir hesap ile deneyin.", HttpStatusCode.Forbidden);
+
             // visitor validation
             AdvertProperties properties = db.advert_properties.Where(ap => ap.advert_id == advert.id).FirstOrDefault();
             if (properties == null) return NotFound();
 
             if(properties.visitor < _rezervation.visitors.Count) ExceptionThrow.Throw("Bu ilan için en fazla. " + properties.visitor + " misafir kabul edilebilmektedir.", HttpStatusCode.Forbidden);
 
-            //get owner
+            // get owner
             Users owner = db.users.Where(u => u.id == advert.user_id).FirstOrDefault();
             if (owner == null) return NotFound();
 
-            // available date validation
-            var dateList = new List<DateTime>();
+            // rezervation dates list
+            var RezervationDates = new List<DateTime>();
             for (DateTime date = _rezervation.checkin; date.Date < _rezervation.checkout.Date; date = date.AddDays(1))
             {
-                dateList.Add(date);
+                RezervationDates.Add(date);
             }
-            if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && dateList.Contains(i.fulldate)).Count() > 0) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
 
+            // available dates validation
+            List<AdvertAvailableDate> avaiableDates = db.advert_avaiable_dates.Where(aad => aad.advert_id == _rezervation.advert_id).ToList();
+            if(avaiableDates.Count > 0)
+            {
+                RezervationDates.ForEach(rd =>
+                {
+                    if (avaiableDates.Find(a => a.fulldate == rd) == null) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
+                });
+            }
+            
+            // unavailable dates validation
+            if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && RezervationDates.Contains(i.fulldate)).Count() > 0) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
+            
             // min layover date validation
-            if((_rezervation.checkout - _rezervation.checkin).TotalDays  < advert.min_layover ) ExceptionThrow.Throw("Bu ilan için en az " + advert.min_layover + " günlük rezervasyon oluşturulabilir.", HttpStatusCode.Forbidden);
+            if ((_rezervation.checkout - _rezervation.checkin).TotalDays  < advert.min_layover ) ExceptionThrow.Throw("Bu ilan için en az " + advert.min_layover + " günlük rezervasyon oluşturulabilir.", HttpStatusCode.Forbidden);
 
             // create rezervation
-            /*
-             * Son gün çıkış yapılacağı ve rezervasyondaki checkout 
-             * tarihinin boşa çıkartmak için son gün tarih aralığından çıkartılır.
-             */
             Rezervations rezervation = new Rezervations
             {
                 advert_id = _rezervation.advert_id,
@@ -318,7 +327,7 @@ namespace rest_api.Controllers
         }
 
         // Approved
-        [HttpGet]
+        [HttpPut]
         [Owner]
         [Route("approve/{id}")]
         public object approve(int id)
@@ -327,6 +336,7 @@ namespace rest_api.Controllers
 
             Rezervations rezervation = db.rezervations.Find(id);
             if (rezervation == null) return NotFound();
+
 
             if(rezervation.updated_date != null)  ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
 
@@ -384,6 +394,88 @@ namespace rest_api.Controllers
             return Ok();
         }
         
+        // Force Approved
+        [HttpPut]
+        [Owner]
+        [Route("force/approve/{id}")]
+        public object forceApprove([FromBody] _ExistRezervation rezervations, int id)
+        {
+            int user_id = Users.GetUserId(User);
+
+            // get exist rezervation id
+            List<int> rezervations_id = new List<int>();
+            rezervations.rezervations.ToList().ForEach(r =>
+            {
+                if(!db.rezervations.Any(rr => rr.owner == user_id)) ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
+                rezervations_id.Add(r.id);
+            });
+
+            // rezervation validation
+            Rezervations rezervation = db.rezervations.Find(id);
+            if (rezervation == null) return NotFound();
+
+            // rezervation validation
+            if (rezervation.updated_date != null) ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
+
+            // rezervation advert validation
+            RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
+            if (advert == null) return NotFound();
+
+            // rezervation owner validation
+            if (advert.user_id != user_id) ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
+
+            // rezervation user validation
+            Users user = db.users.Find(rezervation.user_id);
+            if (user == null) return NotFound();
+
+            rezervation.state = true;
+            rezervation.is_cancel = false;
+            rezervation.updated_date = DateTime.Now;
+
+            // available date validation
+            var dateList = new List<DateTime>();
+            for (DateTime date = rezervation.checkin; date.Date < rezervation.checkout.Date; date = date.AddDays(1))
+            {
+                dateList.Add(date);
+            }
+
+            // set unavaiable date
+            dateList.ForEach(date =>
+            {
+                AdvertUnavailableDate advertUnavaiableDate = new AdvertUnavailableDate
+                {
+                    advert_id = rezervation.advert_id,
+                    day = date.Day,
+                    month = date.Month,
+                    year = date.Year,
+                    fulldate = date,
+                    created_date = DateTime.Now,
+                    rezervation_id = rezervation.id
+                };
+                db.advert_unavaiable_dates.Add(advertUnavaiableDate);
+            });
+
+            db.rezervations.Where(r => r.owner == user_id && rezervations_id.Contains(r.id)).ToList().ForEach(rez =>
+            {
+                rez.state = false;
+                rez.is_cancel = true;
+            });
+
+            db.SaveChanges();
+
+            // send sms
+            NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz onaylandı. - Menkule.com.tr");
+
+            // send notifications
+            Notifications notify = new Notifications();
+            notify.add(user.id, "#" + rezervation.id + " nolu rezervasyon talebiniz onaylandı.", rezervation.id);
+
+            // Send email
+            Mailgun.Send("approve", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.lastname) }, { "rezervation_id", rezervation.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days }, { "price", rezervation.total_price + " TL." } }, user.email, "Rezervasyon talebi onaylandı.");
+
+            return Ok();
+        }
+
         // cancel
         [HttpGet]
         [Route("cancel/{id}")]
