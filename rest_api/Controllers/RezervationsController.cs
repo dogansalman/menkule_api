@@ -71,6 +71,9 @@ namespace rest_api.Controllers
                  join ra in db.rezervation_adverts on r.id equals ra.rezervation_id
                  join c in db.cities on ra.city_id equals c.id
                  join t in db.towns on ra.town_id equals t.id
+                 join ru in db.users on r.user_id equals ru.id
+                 join uimg in db.images on ru.image_id equals uimg.id into j1
+                 from j2 in j1.DefaultIfEmpty()
                  join at in db.advert_types on ra.advert_type_id equals at.id
                  select new
                  {
@@ -85,6 +88,15 @@ namespace rest_api.Controllers
                          type = at.name
 
                      },
+                     user = new {
+                         name = ru.name,
+                         lastname = ru.lastname,
+                         identity_no = ru.identity_no,
+                         photo = j2.url,
+                         gender = ru.gender
+
+                     },
+
                      visitors = (from v in db.rezervation_visitors where v.rezervation_id == r.id select new { visitor = v }).ToList()
                  }
                  ).ToList();
