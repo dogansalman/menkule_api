@@ -471,6 +471,7 @@ namespace rest_api.Controllers
             {
                 rez.state = false;
                 rez.is_cancel = true;
+                rez.updated_date = DateTime.Now;
             });
 
             db.SaveChanges();
