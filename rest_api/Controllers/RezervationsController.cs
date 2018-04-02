@@ -326,7 +326,7 @@ namespace rest_api.Controllers
 
             // send notifications
             Notifications notify = new Notifications();
-            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınz için " + rezervation.days  + " günlük rezervasyon talebi!", rezervation.id);
+            notify.add(advert.user_id, "#" + advert.id + " nolu ilanınız için " + rezervation.days  + " günlük rezervasyon talebi!", rezervation.id);
 
             // send sms
             NetGsm.Send(owner.gsm, "#" + advert.id + " nolu ilaniniz icin toplam " + rezervation.days + " günlük (" + rezervation.total_price + " TL) rezervasyon talebi oluşturuldu. - Menkule.com.tr");
@@ -344,6 +344,7 @@ namespace rest_api.Controllers
         [Route("approve/{id}")]
         public object approve(int id)
         {
+      
             int user_id = Users.GetUserId(User);
 
             Rezervations rezervation = db.rezervations.Find(id);
@@ -361,8 +362,9 @@ namespace rest_api.Controllers
             if (user == null) return NotFound();
 
             // exist rezervation validations
-            var exist_rezervations = db.rezervations.Where(r => r.advert_id == advert.advert_id & r.id != rezervation.id && r.state == false & r.is_cancel == false & r.checkin >= rezervation.checkin & r.checkin <= rezervation.checkout).ToList().FirstOrDefault();
-            if (exist_rezervations != null) ExceptionThrow.Throw(exist_rezervations, HttpStatusCode.NotImplemented);
+            var exist_rezervations = db.rezervations.Where(r => ((r.checkin >= rezervation.checkin && r.checkin <= rezervation.checkout) || (r.checkin <= rezervation.checkin && r.checkout <= rezervation.checkout)) && r.advert_id == advert.advert_id && r.id != id && r.state == false && r.is_cancel == false && r.checkout > rezervation.checkin).ToList();
+
+            if (exist_rezervations.Count > 0) ExceptionThrow.Throw(exist_rezervations, HttpStatusCode.NotImplemented);
 
             rezervation.state = true;
             rezervation.is_cancel = false;
@@ -467,6 +469,7 @@ namespace rest_api.Controllers
                 db.advert_unavaiable_dates.Add(advertUnavaiableDate);
             });
 
+            
             db.rezervations.Where(r => r.owner == user_id && rezervations_id.Contains(r.id)).ToList().ForEach(rez =>
             {
                 rez.state = false;
@@ -475,6 +478,29 @@ namespace rest_api.Controllers
             });
 
             db.SaveChanges();
+
+            rezervations.rezervations.ForEach(r =>
+            {
+                Rezervations rez_ = db.rezervations.Where(r_ => r_.id == r.id && r_.state == false & r_.is_cancel == true).FirstOrDefault();
+                if(rez_ != null)
+                {
+                    Users user_ = db.users.Where(u => u.id == rez_.user_id).FirstOrDefault();
+                    if (user_ != null)
+                    {
+                        // Add notify
+                        Notifications notify_ = new Notifications();
+                        notify_.add(user_.id, "#" + rez_.id + " nolu " + rez_.days + " günlük rezervasyon talebi iptal edildi!", rez_.id);
+
+                        // Send sms
+                        NetGsm.Send(user_.gsm, "#" + rez_.id + " nolu " + "(" + rez_.days + " gün - " + rez_.total_price + " TL) rezervasyonunuz iptal edildi. - Menkule.com.tr");
+
+                        // Send email
+                        Mailgun.Send("cancel", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user_.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user_.lastname) }, { "rezervation_id", rez_.id }, { "checkin", Convert.ToDateTime(rez_.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rez_.checkout).ToShortDateString() }, { "days", rez_.days }, { "price", rez_.total_price + " TL." } }, user_.email, "Rezervasyon talebi iptal edildi.");
+                    }
+                }
+               
+
+            });
 
             // send sms
             NetGsm.Send(user.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz onaylandı. - Menkule.com.tr");

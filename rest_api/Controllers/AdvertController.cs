@@ -12,6 +12,7 @@ using rest_api.ModelViews;
 using rest_api.Libary.Exceptions.ExceptionThrow;
 using rest_api.Libary.Cloudinary;
 using rest_api.OAuth.CustomAttributes.Owner;
+using rest_api.Libary.StringEncode;
 
 namespace rest_api.Controllers
 {
@@ -406,7 +407,7 @@ namespace rest_api.Controllers
 
                 image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
 
-                Images advertImage = Cloudinary.upload(image, "advert/" + user.name + "-" + user.lastname + "-" + user.id);
+                Images advertImage = Cloudinary.upload(image, "advert/" + user.name.ToEng() + "-" + user.lastname.ToEng() + "-" + user.id);
 
                 db.images.Add(advertImage);
                 db.SaveChanges();

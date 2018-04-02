@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Text;
-
+using rest_api.Models;
 
 namespace rest_api.Libary.NetGsm
 {
@@ -29,6 +29,10 @@ namespace rest_api.Libary.NetGsm
 
         public static bool Send(string gsm, string message)
         {
+            // Uniq sms send
+            string uniq = Users.generatePassword(3, 3);
+            message += " ref:" + uniq;
+    
             if (gsm == "") return false;
             gsm = gsm.Replace("-", "");
             gsm = gsm.Replace(" ", "");

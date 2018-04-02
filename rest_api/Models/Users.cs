@@ -77,7 +77,7 @@ namespace rest_api.Models
         public string name
         {
             get { return _name; }
-            set { _name = value.ToLower(); }
+            set { _name = value.ToLower().Trim(); }
         }
         private string _lastname;
         [Required]
@@ -85,7 +85,7 @@ namespace rest_api.Models
         public string lastname
         {
             get { return _lastname; }
-            set { _lastname = value.ToLower(); }
+            set { _lastname = value.ToLower().Trim(); }
         }
         private string _email;
         [Required]
@@ -95,7 +95,7 @@ namespace rest_api.Models
         public string email
         {
             get { return _email; }
-            set { _email = value.ToLower(); }
+            set { _email = value.ToLower().Trim(); }
         }
         [StringLength(255)]
         public string password { get; set; }

@@ -239,6 +239,7 @@
     <Compile Include="Libary\MultipartStreamProvider\MultipartStreamProvider.cs" />
     <Compile Include="Libary\NetGsm\NetGsm.cs" />
     <Compile Include="Libary\Socket\Socket.cs" />
+    <Compile Include="Libary\StringEncode\StringEncode.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\MigrationContexts.cs" />
     <Compile Include="Models\Advert.cs" />
