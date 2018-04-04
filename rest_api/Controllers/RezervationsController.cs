@@ -363,7 +363,8 @@ namespace rest_api.Controllers
             if (user == null) return NotFound();
 
             // exist rezervation validations
-            var exist_rezervations = db.rezervations.Where(r => ((r.checkin >= rezervation.checkin && r.checkin <= rezervation.checkout) || (r.checkin <= rezervation.checkin && r.checkout <= rezervation.checkout)) && r.advert_id == advert.advert_id && r.id != id && r.state == false && r.is_cancel == false && r.checkout > rezervation.checkin).ToList();
+            DateTime checkoutDate = rezervation.checkout.AddDays(-1);
+            var exist_rezervations = db.rezervations.Where(r => ((r.checkin >= rezervation.checkin && r.checkin <= checkoutDate) || (r.checkin <= rezervation.checkin && r.checkout <= checkoutDate)) && r.advert_id == advert.advert_id && r.id != id && r.state == false && r.is_cancel == false && r.checkout > rezervation.checkin).ToList();
 
             if (exist_rezervations.Count > 0) ExceptionThrow.Throw(exist_rezervations, HttpStatusCode.NotImplemented);
 

@@ -38,7 +38,7 @@ namespace rest_api.Models
         [Required]
         public int user_id { get; set; }
         [Required]
-        [StringLength(5000)]
+        [StringLength(10000)]
         public string description { get; set; }
         [Required]
         [StringLength(255)]
