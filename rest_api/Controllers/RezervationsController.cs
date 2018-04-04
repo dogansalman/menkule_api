@@ -11,6 +11,7 @@ using rest_api.Libary.Mailgun;
 using rest_api.Libary.Exceptions.ExceptionThrow;
 using rest_api.OAuth.CustomAttributes.Owner;
 using rest_api.OAuth.CustomAttributes.Activated;
+using Microsoft.Ajax.Utilities;
 
 namespace rest_api.Controllers
 {
@@ -585,5 +586,48 @@ namespace rest_api.Controllers
             return Ok();
         }
 
+
+        // Get Rezervation Adverts
+        [HttpGet]
+        [Authorize]
+        [Owner]
+        [Route("adverts")]
+        public object getRezervationAdvert()
+        {
+
+          
+            int user_id = Users.GetUserId(User);
+            var a = (
+                from ra in db.rezervation_adverts
+                from aimg in db.advert_images
+                where aimg.is_default == true && aimg.advert_id == ra.advert_id
+                join r in db.rezervations on ra.advert_id equals r.advert_id
+                join c in db.cities on ra.city_id equals c.id
+                join t in db.towns on ra.town_id equals t.id
+                join at in db.advert_types on ra.advert_type_id equals at.id
+                join img in db.images on aimg.image_id equals img.id
+                where r.owner == user_id
+                select new
+                {
+                    advert = new
+                    {
+                        id = ra.advert_id,
+                        adress = ra.adress,
+                        user_id = r.owner,
+                        entry_time = ra.entry_time,
+                        exit_time = ra.exit_time,
+                        price = r.day_price,
+                        cancel_time = ra.cancel_time,
+                        title = ra.title
+                    },
+                    city = c,
+                    town = t,
+                    advert_type = at,
+                    image = img.url
+                }
+                    ).DistinctBy(row => row.advert.id).ToList();
+
+            return a;
+        }
     }
 }
