@@ -19,8 +19,8 @@ namespace rest_api.Migrations
         protected override void Seed(rest_api.Models.MigrationContexts context)
         {
 
-            //Seed Advert Types
-            context.AdvertTypes.AddOrUpdate(
+            // Seed Advert Types
+               context.AdvertTypes.AddOrUpdate(
                 at => at.name,
                 new Models.AdvertTypes { name = "Villa"},
                 new Models.AdvertTypes { name = "Oda" },
@@ -30,6 +30,8 @@ namespace rest_api.Migrations
                 new Models.AdvertTypes { name = "Pansiyon" },
                 new Models.AdvertTypes { name = "Otel" }
                 );
+           
+
 
             // Seed Cities and Towns
             var sqlfiles = Directory.GetFiles(AppDomain.CurrentDomain.GetData("DataDirectory").ToString() + "/initialdata", "*.sql");

@@ -24,6 +24,9 @@ namespace rest_api.Models
         [Required]
         public string exit_time { get; set; }
         public bool state { get; set; } = false;
+        public bool is_cancel { get; set; } = false;
+        [StringLength(600)]
+        public string cancel_description { get; set; }
         public int views { get; set; }
         public int score { get; set; }
         [Required]

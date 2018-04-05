@@ -57,6 +57,7 @@ namespace rest_api.Controllers
                             title = a.title,
                             created_date = a.created_date,
                             updated_date = a.updated_date,
+                            is_cancel = a.is_cancel,
                             
                         },
                         city = c, town = t, advert_type = at, image = img.url })
@@ -96,7 +97,9 @@ namespace rest_api.Controllers
                             longitude = a.longitude,
                             title = a.title,
                             created_date = a.created_date,
-                            updated_date = a.updated_date
+                            updated_date = a.updated_date,
+                            is_cancel = a.is_cancel,
+                            cancel_description = a.cancel_description
                         ,
                         possibilities = pos,
                         properties = p,
