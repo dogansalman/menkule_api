@@ -208,5 +208,20 @@ namespace rest_api.Controllers
                 }
                 ).ToList();
         }
+
+        [HttpPut]
+        [Route("read/{id}")]
+        [Authorize]
+        public IHttpActionResult read(int id)
+        {
+            int user_id = Users.GetUserId(User);
+            UserMessages msg = db.user_messages.Where(m => m.message_id == id && m.user_id == user_id).FirstOrDefault();
+            if(msg != null)
+            {
+                msg.last_view = DateTime.Now;
+                db.SaveChanges();
+            }
+            return Ok();
+        }
     }
 }

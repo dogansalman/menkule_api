@@ -484,6 +484,13 @@ namespace rest_api.Controllers
                             created_date = a.created_date,
                             updated_date = a.updated_date
                         },
+                        user = new
+                        {
+                            id = u.id,
+                            fullname = u.name + " " + u.lastname,
+                            user_state = u.state,
+                            photo = j2.url
+                        },
                         possibilities = pos,
                         properties = p,
                         city = (db.cities.Where(c => c.id == a.city_id)).FirstOrDefault(),
