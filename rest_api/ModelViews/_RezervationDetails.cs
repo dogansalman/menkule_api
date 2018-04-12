@@ -20,6 +20,9 @@ namespace rest_api.ModelViews
         public string fullname { get; set; }
         public string gsm { get; set; }
         public string photo { get; set; }
+        public string identity_no { get; set; }
+        public string gender { get; set; }
+
     }
     public class _RezervationDetails
     {

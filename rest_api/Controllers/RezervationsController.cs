@@ -177,7 +177,9 @@ namespace rest_api.Controllers
                             id = u.id,
                             fullname = u.name + " " + u.lastname,
                             gsm = u.gsm,
-                            photo = j2.url
+                            photo = j2.url,
+                            identity_no = u.identity_no,
+                            gender = u.gender
                         }).FirstOrDefault();
 
                 rezervation.user_information = user;
