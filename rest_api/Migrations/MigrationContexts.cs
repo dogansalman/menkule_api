@@ -6,7 +6,7 @@ namespace rest_api.Models
     public class MigrationContexts : DbContext
     {
         //ConnectionStrings From Web.Config
-        public MigrationContexts() : base("ConnectionStr") { }
+        public MigrationContexts() : base(System.Configuration.ConfigurationManager.AppSettings["connection:name"]) { }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

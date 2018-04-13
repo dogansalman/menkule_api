@@ -7,7 +7,7 @@ namespace rest_api.Context
 {
     public class DatabaseContext : DbContext
     {
-        public DatabaseContext() : base("Name=ConnectionStr")
+        public DatabaseContext() : base("Name=" + System.Configuration.ConfigurationManager.AppSettings["connection:name"])
         {
             Database.SetInitializer<DatabaseContext>(null);
         }

@@ -30,8 +30,6 @@ namespace rest_api.Migrations
                 new Models.AdvertTypes { name = "Pansiyon" },
                 new Models.AdvertTypes { name = "Otel" }
                 );
-           
-
 
             // Seed Cities and Towns
             var sqlfiles = Directory.GetFiles(AppDomain.CurrentDomain.GetData("DataDirectory").ToString() + "/initialdata", "*.sql");
