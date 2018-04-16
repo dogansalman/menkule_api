@@ -73,7 +73,7 @@ namespace rest_api.Controllers
         {
             int user_id = Users.GetUserId(User);
 
-            return (from a in db.advert
+            var advert = (from a in db.advert
                     where a.user_id == user_id && a.id == id
                     join p in db.advert_properties on a.id equals p.advert_id
                     join pos in db.advert_possibilities on a.id equals pos.advert_id
@@ -124,6 +124,8 @@ namespace rest_api.Controllers
                                   select new { url = i.url, id = i.id, is_default = ai.is_default }
                               ).ToList()
                     }).FirstOrDefault();
+            if (advert == null) return NotFound();
+            return advert;
         }
 
         //Add
