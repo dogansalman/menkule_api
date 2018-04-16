@@ -123,6 +123,7 @@ namespace rest_api.Controllers
                                         select new { url = i.url, id = i.id, is_default = ai.is_default }
                                     ).ToList()
                           }).FirstOrDefault();
+
             if (advert == null) return NotFound();
             return advert;
         }
