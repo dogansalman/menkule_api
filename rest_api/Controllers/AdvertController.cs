@@ -72,58 +72,58 @@ namespace rest_api.Controllers
         public object detail(int id)
         {
             int user_id = Users.GetUserId(User);
-
             var advert = (from a in db.advert
-                    where a.user_id == user_id && a.id == id
-                    join p in db.advert_properties on a.id equals p.advert_id
-                    join pos in db.advert_possibilities on a.id equals pos.advert_id
-                    select new
-                    {
-                        
-                            id = a.id,
-                            adress = a.adress,
-                            user_id = a.user_id,
-                            entry_time = a.entry_time,
-                            exit_time = a.exit_time,
-                            state = a.state,
-                            views = a.views,
-                            score = a.score,
-                            price = a.price,
-                            min_layover = a.min_layover,
-                            cancel_time = a.cancel_time,
-                            description = a.description,
-                            zoom = a.zoom,
-                            latitude = a.latitude,
-                            longitude = a.longitude,
-                            title = a.title,
-                            created_date = a.created_date,
-                            updated_date = a.updated_date,
-                            is_cancel = a.is_cancel,
-                            cancel_description = a.cancel_description
-                        ,
-                        possibilities = pos,
-                        properties = p,
-                        city = (db.cities.Where(c => c.id == a.city_id)).FirstOrDefault(),
-                        town = (db.towns.Where(t => t.id == a.town_id)).FirstOrDefault(),
-                        advert_type = (db.advert_types.Where(at => at.id == a.advert_type_id)).FirstOrDefault(),
-                        available_date = (
-                            from ad in db.advert_avaiable_dates
-                            where ad.advert_id == id
-                            group ad by ad.uniq into g
-                                select new
-                                {
-                                    from_date = g.Min(e => e.fulldate),
-                                    to_date = g.Max(e => e.fulldate),
-                                    uniq = g.Select(a => a.uniq).FirstOrDefault()
-                                }
-                            ).ToList(),
-                        unavailable_date = (db.advert_unavaiable_dates.Where(uad => uad.advert_id == id)).ToList(),
-                        images = (from ai in db.advert_images
-                                  where ai.advert_id == a.id
-                                  join i in db.images on ai.image_id equals i.id
-                                  select new { url = i.url, id = i.id, is_default = ai.is_default }
-                              ).ToList()
-                    }).FirstOrDefault();
+                          where a.user_id == user_id && a.id == id
+                          join p in db.advert_properties on a.id equals p.advert_id
+                          join pos in db.advert_possibilities on a.id equals pos.advert_id
+                          select new
+                          {
+
+                              id = a.id,
+                              adress = a.adress,
+                              user_id = a.user_id,
+                              entry_time = a.entry_time,
+                              exit_time = a.exit_time,
+                              state = a.state,
+                              views = a.views,
+                              score = a.score,
+                              price = a.price,
+                              min_layover = a.min_layover,
+                              cancel_time = a.cancel_time,
+                              description = a.description,
+                              zoom = a.zoom,
+                              latitude = a.latitude,
+                              longitude = a.longitude,
+                              title = a.title,
+                              created_date = a.created_date,
+                              updated_date = a.updated_date,
+                              is_cancel = a.is_cancel,
+                              cancel_description = a.cancel_description
+                              ,
+                              possibilities = pos,
+                              properties = p,
+                              city = (db.cities.Where(c => c.id == a.city_id)).FirstOrDefault(),
+                              town = (db.towns.Where(t => t.id == a.town_id)).FirstOrDefault(),
+                              advert_type = (db.advert_types.Where(at => at.id == a.advert_type_id)).FirstOrDefault(),
+                              available_date = (
+                                  from ad in db.advert_avaiable_dates
+                                  where ad.advert_id == id
+                                  group ad by ad.uniq into g
+                                  select new
+                                  {
+                                      from_date = g.Min(e => e.fulldate),
+                                      to_date = g.Max(e => e.fulldate),
+                                      uniq = g.Select(a => a.uniq).FirstOrDefault()
+                                  }
+                                  ).ToList(),
+                              unavailable_date = (db.advert_unavaiable_dates.Where(uad => uad.advert_id == id)).ToList(),
+                              images = (from ai in db.advert_images
+                                        where ai.advert_id == a.id
+                                        join i in db.images on ai.image_id equals i.id
+                                        select new { url = i.url, id = i.id, is_default = ai.is_default }
+                                    ).ToList()
+                          }).FirstOrDefault();
+
             if (advert == null) return NotFound();
             return advert;
         }
@@ -411,8 +411,8 @@ namespace rest_api.Controllers
                 if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
 
                 image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
-                
-                Images advertImage = Cloudinary.upload(image, "advert/" + user.name.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + user.lastname.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + user.id);
+
+                Images advertImage = Cloudinary.upload(image, "advert/" + user.name.ToEng() + "-" + user.lastname.ToEng() + "-" + user.id);
 
                 db.images.Add(advertImage);
                 db.SaveChanges();
