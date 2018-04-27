@@ -220,9 +220,7 @@ namespace rest_api.Controllers
                     }
                 });
             }
-            
-        
-            
+
             try
             {
                 db.SaveChanges();
@@ -295,8 +293,6 @@ namespace rest_api.Controllers
 
             db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(ud => ud.advert_id == id));
-
-
 
 
             //Images
@@ -401,7 +397,6 @@ namespace rest_api.Controllers
         {
             try
             {
- 
                 int user_id = Users.GetUserId(User);
                 Users user = db.users.Find(user_id);
 
