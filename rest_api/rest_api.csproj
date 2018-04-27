@@ -275,6 +275,7 @@
     <Compile Include="ModelViews\_Message.cs" />
     <Compile Include="ModelViews\_Rezervation.cs" />
     <Compile Include="ModelViews\_RezervationDetails.cs" />
+    <Compile Include="ModelViews\_RezervationManuel.cs" />
     <Compile Include="ModelViews\_TokenResetPassword.cs" />
     <Compile Include="ModelViews\_Code.cs" />
     <Compile Include="ModelViews\_Mail.cs" />

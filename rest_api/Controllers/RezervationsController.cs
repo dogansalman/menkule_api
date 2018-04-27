@@ -63,16 +63,16 @@ namespace rest_api.Controllers
         {
 
             int user_id = Users.GetUserId(User);
-            return (
+            var rezervations =  (
                  from r in db.rezervations
                  where r.owner == user_id
                  from aimg in db.advert_images
+                 from ru in db.users
                  where aimg.is_default == true && aimg.advert_id == r.advert_id
                  join img in db.images on aimg.image_id equals img.id
                  join ra in db.rezervation_adverts on r.id equals ra.rezervation_id
                  join c in db.cities on ra.city_id equals c.id
                  join t in db.towns on ra.town_id equals t.id
-                 join ru in db.users on r.user_id equals ru.id
                  join uimg in db.images on ru.image_id equals uimg.id into j1
                  from j2 in j1.DefaultIfEmpty()
                  join at in db.advert_types on ra.advert_type_id equals at.id
@@ -86,8 +86,8 @@ namespace rest_api.Controllers
                          city = c.name,
                          town = t.name,
                          photo = img.url,
-                         type = at.name
-
+                         type = at.name,
+                         is_manuel = r.is_manuel
                      },
                      user = new {
                          name = ru.name,
@@ -102,6 +102,8 @@ namespace rest_api.Controllers
                  }
                  ).ToList();
 
+            return rezervations;
+            
         }
 
         // Get
@@ -339,6 +341,17 @@ namespace rest_api.Controllers
 
             return Ok();
 
+        }
+
+        // Create Manuel
+        [HttpPost]
+        [Authorize]
+        [Route("manuel")]
+        [Activated]
+        [Owner]
+        public IHttpActionResult addManuel([FromBody] _RezervationManuel _rezervation)
+        {
+            return Ok(_rezervation);
         }
 
         // Approved
@@ -632,5 +645,7 @@ namespace rest_api.Controllers
 
             return a;
         }
+
+
     }
 }

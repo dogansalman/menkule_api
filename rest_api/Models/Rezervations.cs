@@ -50,6 +50,7 @@ namespace rest_api.Models
         public string description_state { get; set; }
         public bool state { get; set; } = false;
         public bool is_cancel { get; set; } = false;
+        public bool is_manuel { get; set; } = false;
         public DateTime created_date { get; set; } = DateTime.Now;
         public DateTime? updated_date { get; set; }
         private int getDateDiff(DateTime checkin, DateTime checkout)
