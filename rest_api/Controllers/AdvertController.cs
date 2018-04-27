@@ -411,8 +411,8 @@ namespace rest_api.Controllers
                 if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
 
                 image.AddImageWatermark(HttpContext.Current.Server.MapPath("~/App_Data/watermark/logo.png"), 150, 56, "Right", "Bottom", 40, 10);
-
-                Images advertImage = Cloudinary.upload(image, "advert/" + user.name.ToEng() + "-" + user.lastname.ToEng() + "-" + user.id);
+                
+                Images advertImage = Cloudinary.upload(image, "advert/" + user.name.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + user.lastname.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + user.id);
 
                 db.images.Add(advertImage);
                 db.SaveChanges();
