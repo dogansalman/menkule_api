@@ -1,5 +1,7 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace rest_api.Libary.StringEncode
 {
@@ -24,6 +26,32 @@ namespace rest_api.Libary.StringEncode
             }
 
             return result.ToString().Trim();
+        }
+
+        public static string ReduceWhitespace(this string value)
+        {
+            var newString = new StringBuilder();
+            bool previousIsWhitespace = false;
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (Char.IsWhiteSpace(value[i]))
+                {
+                    if (previousIsWhitespace)
+                    {
+                        continue;
+                    }
+
+                    previousIsWhitespace = true;
+                }
+                else
+                {
+                    previousIsWhitespace = false;
+                }
+
+                newString.Append(value[i]);
+            }
+
+            return newString.ToString();
         }
     }
 }
