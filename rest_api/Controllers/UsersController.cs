@@ -16,7 +16,7 @@ using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Mailgun;
 using rest_api.Libary.NetGsm;
 using rest_api.Libary.Cloudinary;
-
+using rest_api.Libary.StringEncode;
 
 namespace rest_api.Controllers
 {
@@ -522,7 +522,7 @@ namespace rest_api.Controllers
             var image = new WebImage(httpRequest.InputStream);
             if (!imageExt.Contains(image.ImageFormat.ToString().ToLower())) new BadImageFormatException();
 
-            Images userImage = Cloudinary.upload(image, "users/" + user.name + "-" + user.lastname + "-" + user.id);
+            Images userImage = Cloudinary.upload(image, "users/" + user.name.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + user.lastname.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + user.id);
             if (userImage == null) return BadRequest();
 
             db.images.Add(userImage);
