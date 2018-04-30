@@ -16,7 +16,7 @@ using rest_api.Context;
 using rest_api.Libary.Bcrypt;
 using rest_api.Libary.Cloudinary;
 using rest_api.OAuth.AuthBackdoor;
-
+using rest_api.Libary.StringEncode;
 
 namespace rest_api.Controllers
 {
@@ -100,7 +100,7 @@ namespace rest_api.Controllers
                     // send cloud
                     var image = new WebImage(photoStreamData);
                     var httpRequest = HttpContext.Current.Request;
-                    Images userImage = Cloudinary.upload(image, "users/" + userData.name + "-" + userData.lastname + "-" + userData.id);
+                    Images userImage = Cloudinary.upload(image, "users/" + userData.name.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + userData.lastname.ReduceWhitespace().Replace(" ", "-").ToEng() + "-" + userData.id);
                     if(userImage != null)
                     {
                         db.images.Add(userImage);
