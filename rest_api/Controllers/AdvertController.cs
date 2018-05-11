@@ -58,10 +58,13 @@ namespace rest_api.Controllers
                             created_date = a.created_date,
                             updated_date = a.updated_date,
                             is_cancel = a.is_cancel,
-                            
+
                         },
-                        city = c, town = t, advert_type = at, image = img.url })
-                        .ToList();
+                        city = c,
+                        town = t,
+                        advert_type = at,
+                        image = img.url
+                    }).OrderBy(a => a.advert.state).ToList();
         }
 
         //Detail
