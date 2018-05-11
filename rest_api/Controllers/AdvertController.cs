@@ -58,10 +58,13 @@ namespace rest_api.Controllers
                             created_date = a.created_date,
                             updated_date = a.updated_date,
                             is_cancel = a.is_cancel,
-                            
+
                         },
-                        city = c, town = t, advert_type = at, image = img.url })
-                        .ToList();
+                        city = c,
+                        town = t,
+                        advert_type = at,
+                        image = img.url
+                    }).OrderBy(a => a.advert.state).ToList();
         }
 
         //Detail
@@ -220,9 +223,7 @@ namespace rest_api.Controllers
                     }
                 });
             }
-            
-        
-            
+
             try
             {
                 db.SaveChanges();
@@ -295,8 +296,6 @@ namespace rest_api.Controllers
 
             db.advert_avaiable_dates.RemoveRange(db.advert_avaiable_dates.Where(ad => ad.advert_id == id));
             db.advert_unavaiable_dates.RemoveRange(db.advert_unavaiable_dates.Where(ud => ud.advert_id == id));
-
-
 
 
             //Images
@@ -401,7 +400,6 @@ namespace rest_api.Controllers
         {
             try
             {
- 
                 int user_id = Users.GetUserId(User);
                 Users user = db.users.Find(user_id);
 
