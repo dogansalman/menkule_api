@@ -346,11 +346,106 @@ namespace rest_api.Controllers
         // Create Manuel
         [HttpPost]
         [Authorize]
-        [Route("manuel")]
+        [Route("add")]
         [Activated]
         [Owner]
         public IHttpActionResult addManuel([FromBody] _RezervationManuel _rezervation)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            int user_id = Users.GetUserId(User);
+
+            Advert advert = db.advert.Where(a => a.state == true && a.id == _rezervation.advert_id).FirstOrDefault();
+            if (advert == null) return NotFound();
+
+            if (advert.user_id != user_id)  ExceptionThrow.Throw("Sadece kendi ilanınız için rezervasyon talebi oluşturabilirsiniz.", HttpStatusCode.BadRequest);
+
+
+            // visitor validation
+            AdvertProperties properties = db.advert_properties.Where(ap => ap.advert_id == advert.id).FirstOrDefault();
+            if (properties == null) return NotFound();
+
+            if (properties.visitor < _rezervation.visitors.Count) ExceptionThrow.Throw("Bu ilan için en fazla. " + properties.visitor + " misafir kabul edilebilmektedir.", HttpStatusCode.Forbidden);
+
+
+            var RezervationDates = new List<DateTime>();
+            for (DateTime date = _rezervation.checkin; date.Date < _rezervation.checkout.Date; date = date.AddDays(1))
+            {
+                RezervationDates.Add(date);
+            }
+
+            // available dates validation
+            List<AdvertAvailableDate> avaiableDates = db.advert_avaiable_dates.Where(aad => aad.advert_id == _rezervation.advert_id).ToList();
+            if (avaiableDates.Count > 0)
+            {
+                RezervationDates.ForEach(rd =>
+                {
+                    if (avaiableDates.Find(a => a.fulldate == rd) == null) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
+                });
+            }
+
+            // unavailable dates validation
+            if (db.advert_unavaiable_dates.Where(i => i.advert_id == _rezervation.advert_id && RezervationDates.Contains(i.fulldate)).Count() > 0) ExceptionThrow.Throw("İlan belirtilen tarih için müsait değil.", HttpStatusCode.Forbidden);
+
+            // min layover date validation
+            if ((_rezervation.checkout - _rezervation.checkin).TotalDays < advert.min_layover) ExceptionThrow.Throw("Bu ilan için en az " + advert.min_layover + " günlük rezervasyon oluşturulabilir.", HttpStatusCode.Forbidden);
+
+            // create rezervation
+            Rezervations rezervation = new Rezervations
+            {
+                advert_id = _rezervation.advert_id,
+                checkin = _rezervation.checkin,
+                checkout = _rezervation.checkout,
+                created_date = DateTime.Now,
+                gsm = _rezervation.gsm,
+                name = _rezervation.name,
+                lastname = _rezervation.lastname,
+                visitor = _rezervation.visitors.Count,
+                user_id = 0,
+                day_price = advert.price,
+                owner = advert.user_id,
+                is_manuel = true
+
+            };
+
+            db.rezervations.Add(rezervation);
+            db.SaveChanges();
+
+            // create rezervations advert
+            RezervationAdverts rezervation_advert = new RezervationAdverts
+            {
+                adress = advert.adress,
+                advert_id = advert.id,
+                cancel_time = advert.cancel_time,
+                city_id = advert.city_id,
+                town_id = advert.town_id,
+                title = advert.title,
+                description = advert.description,
+                entry_time = advert.entry_time,
+                exit_time = advert.exit_time,
+                latitude = advert.latitude,
+                longitude = advert.longitude,
+                rezervation_id = rezervation.id,
+                created_date = advert.created_date,
+                user_id = advert.user_id,
+                advert_type_id = advert.advert_type_id
+            };
+            db.rezervation_adverts.Add(rezervation_advert);
+
+            // create visitors
+            _rezervation.visitors.ToList().ForEach(v =>
+            {
+                RezervationVisitors visitor = new RezervationVisitors
+                {
+                    created_date = DateTime.Now,
+                    fullname = v.fullname,
+                    gender = v.gender,
+                    rezervation_id = rezervation.id,
+                    tc = v.tc
+                };
+                db.rezervation_visitors.Add(visitor);
+            });
+
             return Ok(_rezervation);
         }
 

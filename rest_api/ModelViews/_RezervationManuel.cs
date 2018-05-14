@@ -17,6 +17,18 @@ namespace rest_api.ModelViews
         public DateTime checkout { get; set; }
         [Required]
         public int advert_id { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string name { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string lastname { get; set; }
+        [Required]
+        [Phone]
+        public string gsm { get; set; }
+        [Required]
+        [EmailAddress]
+        public string email { get; set; }
 
     }
 }
