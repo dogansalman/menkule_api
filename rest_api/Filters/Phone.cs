@@ -23,6 +23,7 @@ namespace rest_api.Filters
         public override bool IsValid(object value)
         {
             var phoneNumber = (String)value;
+            if (String.IsNullOrEmpty(phoneNumber)) return true;
             bool result = true;
             if (this.Mask != null)
             {
@@ -33,6 +34,7 @@ namespace rest_api.Filters
         // Checks if the entered phone number matches the mask. 
         internal bool MatchesMask(string mask, string phoneNumber)
         {
+         
             if (mask.Length != phoneNumber.Trim().Length)
             {
                 // Length mismatch. 
