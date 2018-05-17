@@ -1,4 +1,5 @@
-﻿using rest_api.Models;
+﻿using rest_api.Filters;
+using rest_api.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -29,6 +30,11 @@ namespace rest_api.ModelViews
         [Required]
         [EmailAddress]
         public string email { get; set; }
+        [PhoneMask("00000000000")]
+        public string identity { get; set; }
+        [StringLength(5)]
+        [Gender]
+        public string gender { get; set; }
 
     }
 }

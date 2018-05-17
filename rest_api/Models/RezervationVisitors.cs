@@ -24,7 +24,8 @@ namespace rest_api.Models
         [PhoneMask("0000000000")]
         [StringLength(11)]
         public string gsm { get; set; }
-        public bool manuel_user { get; set; } = false;
+        public bool is_manuel_added { get; set; } = false;
+        public bool is_rezervation_profile { get; set; } = false;
         public DateTime created_date { get; set; } = DateTime.Now;
     }
 }

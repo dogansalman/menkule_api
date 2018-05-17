@@ -47,7 +47,7 @@ namespace rest_api.ModelViews
         public List<RezervationVisitors> visitors { get; set; }
         public _RezervationUserInfo user_information { get; set; }
         public bool is_cancelable { get; set; }
-       
+        public bool is_manuel { get; set; }
 
     }
 }

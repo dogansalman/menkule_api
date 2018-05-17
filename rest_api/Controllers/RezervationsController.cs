@@ -65,14 +65,14 @@ namespace rest_api.Controllers
             int user_id = Users.GetUserId(User);
             var rezervations =  (
                  from r in db.rezervations
-                 where r.owner == user_id
                  from aimg in db.advert_images
-                 from ru in db.users
+                 where r.owner == user_id 
                  where aimg.is_default == true && aimg.advert_id == r.advert_id
                  join img in db.images on aimg.image_id equals img.id
                  join ra in db.rezervation_adverts on r.id equals ra.rezervation_id
                  join c in db.cities on ra.city_id equals c.id
                  join t in db.towns on ra.town_id equals t.id
+                 join ru in db.users on r.user_id equals ru.id
                  join uimg in db.images on ru.image_id equals uimg.id into j1
                  from j2 in j1.DefaultIfEmpty()
                  join at in db.advert_types on ra.advert_type_id equals at.id
@@ -141,6 +141,7 @@ namespace rest_api.Controllers
                                    description_state = r.description_state,
                                    note = r.note,
                                    is_cancel = r.is_cancel,
+                                   is_manuel = r.is_manuel,
                                    state = r.state,
                                    created_date = r.created_date,
                                    updated_date = r.updated_date,
@@ -356,7 +357,7 @@ namespace rest_api.Controllers
             int user_id = Users.GetUserId(User);
 
             Advert advert = db.advert.Where(a => a.state == true && a.id == _rezervation.advert_id).FirstOrDefault();
-            if (advert == null) return NotFound();
+            if (advert == null)  ExceptionThrow.Throw("İlanınız pasif görünmekte. Onaylandıktan sonra tekrar deneyin.", HttpStatusCode.BadRequest);
 
             if (advert.user_id != user_id)  ExceptionThrow.Throw("Sadece kendi ilanınız için rezervasyon talebi oluşturabilirsiniz.", HttpStatusCode.BadRequest);
 
@@ -401,8 +402,9 @@ namespace rest_api.Controllers
                 name = _rezervation.name,
                 lastname = _rezervation.lastname,
                 visitor = _rezervation.visitors.Count,
-                user_id = 0,
+                user_id = user_id,
                 day_price = advert.price,
+                state = true,
                 owner = advert.user_id,
                 is_manuel = true
 
@@ -441,10 +443,60 @@ namespace rest_api.Controllers
                     fullname = v.fullname,
                     gender = v.gender,
                     rezervation_id = rezervation.id,
-                    tc = v.tc
+                    tc = v.tc,
+                    is_manuel_added = true
                 };
                 db.rezervation_visitors.Add(visitor);
             });
+
+            RezervationVisitors rezervation_visitor = new RezervationVisitors
+            {
+                created_date = DateTime.Now,
+                fullname = _rezervation.name + " " + _rezervation.lastname,
+                gender = _rezervation.gender,
+                rezervation_id = rezervation.id,
+                tc = _rezervation.identity,
+                email = _rezervation.email,
+                gsm = _rezervation.gsm,
+                is_manuel_added = true,
+                is_rezervation_profile = true
+            };
+            db.rezervation_visitors.Add(rezervation_visitor);
+            
+            db.SaveChanges();
+
+
+            // available date validation
+            var dateList = new List<DateTime>();
+            for (DateTime date = rezervation.checkin; date.Date < rezervation.checkout.Date; date = date.AddDays(1))
+            {
+                dateList.Add(date);
+            }
+
+            // set unavaiable date
+            dateList.ForEach(date =>
+            {
+                AdvertUnavailableDate advertUnavaiableDate = new AdvertUnavailableDate
+                {
+                    advert_id = rezervation.advert_id,
+                    day = date.Day,
+                    month = date.Month,
+                    year = date.Year,
+                    fulldate = date,
+                    created_date = DateTime.Now,
+                    rezervation_id = rezervation.id
+                };
+                db.advert_unavaiable_dates.Add(advertUnavaiableDate);
+            });
+
+            db.SaveChanges();
+
+            // send sms
+            NetGsm.Send(_rezervation.gsm, "#" + rezervation.id + " nolu " + "(" + rezervation.days + " gün - " + rezervation.total_price + " TL) rezervasyonunuz onaylandı. - Menkule.com.tr");
+
+            // Send email
+            Mailgun.Send("approve", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(_rezervation.name) + " " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(_rezervation.lastname) }, { "rezervation_id", rezervation.id }, { "checkin", Convert.ToDateTime(rezervation.checkin).ToShortDateString() }, { "checkout", Convert.ToDateTime(rezervation.checkout).ToShortDateString() }, { "days", rezervation.days }, { "price", rezervation.total_price + " TL." } }, _rezervation.email, "Rezervasyon talebi onaylandı.");
+
 
             return Ok(_rezervation);
         }
@@ -462,7 +514,7 @@ namespace rest_api.Controllers
             if (rezervation == null) return NotFound();
 
 
-            if(rezervation.updated_date != null)  ExceptionThrow.Throw("Yetkisiz işlem gerçekleştirildi!", HttpStatusCode.Forbidden);
+            if(rezervation.state == true)  ExceptionThrow.Throw("Rezervasyon talebi daha önce onaylanmış.", HttpStatusCode.Forbidden);
 
             RezervationAdverts advert = db.rezervation_adverts.Where(ra => ra.advert_id == rezervation.advert_id).FirstOrDefault();
             if (advert == null) return NotFound();
