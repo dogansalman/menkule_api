@@ -230,6 +230,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Libary\Bcrypt\Bcrypt.cs" />
+    <Compile Include="Libary\BitlyUrl\BitlyUrl.cs" />
     <Compile Include="Libary\Cloudinary\Cloudinary.cs" />
     <Compile Include="Libary\Exceptions\ExceptionThrow\ExceptionThrow.cs" />
     <Compile Include="Libary\Exceptions\ValidationException\ValidationException.cs" />
@@ -276,6 +277,7 @@
     <Compile Include="ModelViews\_Rezervation.cs" />
     <Compile Include="ModelViews\_RezervationDetails.cs" />
     <Compile Include="ModelViews\_RezervationManuel.cs" />
+    <Compile Include="ModelViews\_RezervationShareInfo.cs" />
     <Compile Include="ModelViews\_TokenResetPassword.cs" />
     <Compile Include="ModelViews\_Code.cs" />
     <Compile Include="ModelViews\_Mail.cs" />

@@ -11,7 +11,9 @@ using rest_api.Libary.Mailgun;
 using rest_api.Libary.Exceptions.ExceptionThrow;
 using rest_api.OAuth.CustomAttributes.Owner;
 using rest_api.OAuth.CustomAttributes.Activated;
+using rest_api.Libary.BitlyUrl;
 using Microsoft.Ajax.Utilities;
+using RestSharp.Extensions.MonoHttp;
 
 namespace rest_api.Controllers
 {
@@ -501,6 +503,24 @@ namespace rest_api.Controllers
             return Ok(_rezervation);
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("share")]
+        [Activated]
+        [Owner]
+        public IHttpActionResult share([FromBody] _RezervationShareInfo shareInfo)
+        {
+            Advert advert = db.advert.Where(a => a.id == shareInfo.advert_id && a.user_id == Users.GetUserId(User)).FirstOrDefault();
+            if (advert == null) ExceptionThrow.Throw("Yetkisiz işlem denemesi.", HttpStatusCode.Forbidden);
+
+            Uri url = new Uri("https://www.menkule.com.tr/rezervation/" + shareInfo.advert_id + "?checkin=" + shareInfo.checkin.Date.ToString("yyyy-MM-dd") + "&checkout=" + shareInfo.checkout.Date.ToString("yyyy-MM-dd"));  
+            var shortedUrl = BitlyUrl.Short(url.ToString());
+            if (shortedUrl == null) ExceptionThrow.Throw("Bir sorun oluştu. Lütfen tekrar deneyin.", HttpStatusCode.NotImplemented);
+            if (shareInfo.gsm != null) NetGsm.Send(shareInfo.gsm, "SN. " + shareInfo.fullname + " rezervasyon talebiniz oluşturuldu. Onaylamak icin formu doldurun " + shortedUrl + " - Menkule");
+            if(shareInfo.email != null) Mailgun.Send("rezervation_form", new Dictionary<string, object>() { { "fullname", System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(shareInfo.fullname) }, { "url", shortedUrl } }, shareInfo.email, "Rezervasyon Formunu Doldurun.");
+
+            return Ok();
+        }
         // Approved
         [HttpPut]
         [Owner]
