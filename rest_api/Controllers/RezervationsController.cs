@@ -510,7 +510,8 @@ namespace rest_api.Controllers
         [Owner]
         public IHttpActionResult share([FromBody] _RezervationShareInfo shareInfo)
         {
-            Advert advert = db.advert.Where(a => a.id == shareInfo.advert_id && a.user_id == Users.GetUserId(User)).FirstOrDefault();
+            int user_id = Users.GetUserId(User);
+            Advert advert = db.advert.Where(a => a.id == shareInfo.advert_id && a.user_id == user_id ).FirstOrDefault();
             if (advert == null) ExceptionThrow.Throw("Yetkisiz işlem denemesi.", HttpStatusCode.Forbidden);
 
             Uri url = new Uri("https://www.menkule.com.tr/rezervation/" + shareInfo.advert_id + "?checkin=" + shareInfo.checkin.Date.ToString("yyyy-MM-dd") + "&checkout=" + shareInfo.checkout.Date.ToString("yyyy-MM-dd"));  
