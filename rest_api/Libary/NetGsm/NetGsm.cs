@@ -40,13 +40,13 @@ namespace rest_api.Libary.NetGsm
             ss += "<?xml version='1.0' encoding='UTF-8'?>";
             ss += "<mainbody>";
             ss += "<header>";
-            ss += "<company>08503467669</company>";
-            ss += "<usercode>5536155546</usercode>";
-            ss += "<password>112233SD</password>";
+            ss += "<company>*****************</company>";
+            ss += "<usercode>*****************</usercode>";
+            ss += "<password>*****************</password>";
             ss += "<startdate></startdate>";
             ss += "<stopdate></stopdate>";
             ss += "<type>1:n</type>";
-            ss += "<msgheader>08503467669</msgheader>";
+            ss += "<msgheader>*****************</msgheader>";
             ss += "</header>";
             ss += "<body>";
             ss += "<msg><![CDATA[" + message + "]]></msg>";
